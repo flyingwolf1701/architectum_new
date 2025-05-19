@@ -31,3 +31,7 @@
 {Any notes about implementation choices, difficulties, or follow-up needed}
 
 ### Change Log
+
+## QA Testing Guide
+
+{This section should be completed when the story implementation is done and tests are passing. Include step-by-step instructions for how a human tester can verify the functionality works as expected. Include example inputs, expected outputs, and any edge cases that should be tested.}

@@ -47,5 +47,12 @@ Before marking a story as 'Review', please go through each item in this checklis
     - [ ] User-facing documentation updated, if changes impact users.
     - [ ] Technical documentation (e.g., READMEs, system diagrams) updated if significant architectural changes were made.
 
+8.  **QA Documentation:**
+    - [ ] QA notes have been added to the story under the "QA Testing Guide" section.
+    - [ ] QA notes include step-by-step instructions to test story functionality.
+    - [ ] QA notes provide example inputs and expected outputs where applicable.
+    - [ ] QA notes identify potential edge cases that should be tested.
+    - [ ] Screenshots or other visual aids are included if they would help clarify testing procedures.
+
 ## Final Confirmation:
-- [ ] I, the Developer Agent, confirm that all applicable items above have been addressed. 
+- [ ] I, the Developer Agent, confirm that all applicable items above have been addressed.

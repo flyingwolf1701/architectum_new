@@ -297,3 +297,4 @@
         - Upload the relevant story files and any necessary granular documentation
         - Ask the developer agent to implement the story
       - Recommend saving all story files in a structured manner (e.g., in a stories/ directory in the project)
+      - **QA Notes Option:** Inform the user that when a story is completed with passing tests and required coverage, they should request the developer agent to add QA testing notes by asking: "Would you like to add QA testing notes to help with human verification of this functionality?" The agent will then create comprehensive testing instructions in the "QA Testing Guide" section of the story.
