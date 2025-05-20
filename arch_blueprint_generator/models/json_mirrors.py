@@ -4,11 +4,13 @@ JSON Mirrors structure for code representation.
 
 import json
 import os
+import copy
 from typing import Dict, List, Optional, Any, Union, Tuple
 import hashlib
 from pathlib import Path
 
 from arch_blueprint_generator.errors.exceptions import FileError, ModelError
+from arch_blueprint_generator.models.detail_level import DetailLevel
 from arch_blueprint_generator.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -41,20 +43,48 @@ class CodeElement:
         self.line_end = line_end
         self.metadata = metadata or {}
     
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, detail_level: DetailLevel = DetailLevel.STANDARD) -> Dict[str, Any]:
         """
-        Convert the code element to a JSON representation.
+        Convert the code element to a JSON representation with the specified detail level.
         
+        Args:
+            detail_level: The level of detail to include
+            
         Returns:
             JSON representation of the code element
         """
-        return {
-            "name": self.name,
-            "type": self.type,
-            "line_start": self.line_start,
-            "line_end": self.line_end,
-            "metadata": self.metadata
-        }
+        if detail_level == DetailLevel.MINIMAL:
+            # Minimal detail level: only name, type, and line numbers
+            return {
+                "name": self.name,
+                "type": self.type,
+                "line_start": self.line_start,
+                "line_end": self.line_end
+            }
+        elif detail_level == DetailLevel.STANDARD:
+            # Standard detail level: essential metadata
+            essential_metadata = {}
+            metadata_keys = ["visibility", "return_type", "parameters", "doc_summary"]
+            for key in metadata_keys:
+                if key in self.metadata:
+                    essential_metadata[key] = self.metadata[key]
+            
+            return {
+                "name": self.name,
+                "type": self.type,
+                "line_start": self.line_start,
+                "line_end": self.line_end,
+                "metadata": essential_metadata
+            }
+        else:  # DetailLevel.DETAILED
+            # Detailed level: full metadata
+            return {
+                "name": self.name,
+                "type": self.type,
+                "line_start": self.line_start,
+                "line_end": self.line_end,
+                "metadata": self.metadata
+            }
 
     
     @classmethod
@@ -75,6 +105,7 @@ class CodeElement:
             data["line_end"],
             data.get("metadata", {})
         )
+
 
 
 class FileContent:
@@ -154,24 +185,47 @@ class FileContent:
         if import_path in self.imports:
             self.imports.remove(import_path)
     
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, detail_level: DetailLevel = DetailLevel.STANDARD) -> Dict[str, Any]:
         """
-        Convert the file content to a JSON representation.
+        Convert the file content to a JSON representation with the specified detail level.
         
+        Args:
+            detail_level: The level of detail to include
+            
         Returns:
             JSON representation of the file content
         """
-        elements_json = {name: element.to_json() for name, element in self.elements.items()}
+        if detail_level == DetailLevel.MINIMAL:
+            # Minimal detail level: just path, extension, and element count
+            return {
+                "path": self.path,
+                "extension": self.extension,
+                "element_count": len(self.elements),
+                "import_count": len(self.imports)
+            }
+        
+        # For Standard and Detailed levels, include elements with appropriate detail level
+        elements_json = {}
+        for name, element in self.elements.items():
+            elements_json[name] = element.to_json(detail_level)
         
         result = {
             "path": self.path,
             "extension": self.extension,
             "elements": elements_json,
-            "imports": self.imports
         }
         
-        if self.source_hash:
-            result["source_hash"] = self.source_hash
+        # Only include imports and source_hash for Standard and Detailed levels
+        if detail_level in [DetailLevel.STANDARD, DetailLevel.DETAILED]:
+            result["imports"] = self.imports
+            
+            if self.source_hash:
+                result["source_hash"] = self.source_hash
+        
+        # Add extra metadata for Detailed level
+        if detail_level == DetailLevel.DETAILED:
+            # Add any additional file-level documentation or metadata here
+            result["detail_level"] = detail_level.value
         
         return result
     
@@ -186,6 +240,16 @@ class FileContent:
         Returns:
             FileContent instance
         """
+        # Handle minimal detail level format
+        if "elements" not in data:
+            return cls(
+                data["path"],
+                data["extension"],
+                {},
+                [],
+                data.get("source_hash")
+            )
+        
         elements = {}
         for name, element_data in data["elements"].items():
             elements[name] = CodeElement.from_json(element_data)
@@ -260,18 +324,30 @@ class DirectoryContent:
         if directory_path in self.subdirectories:
             self.subdirectories.remove(directory_path)
     
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, detail_level: DetailLevel = DetailLevel.STANDARD) -> Dict[str, Any]:
         """
-        Convert the directory content to a JSON representation.
+        Convert the directory content to a JSON representation with the specified detail level.
         
+        Args:
+            detail_level: The level of detail to include
+            
         Returns:
             JSON representation of the directory content
         """
-        return {
-            "path": self.path,
-            "files": self.files,
-            "subdirectories": self.subdirectories
-        }
+        if detail_level == DetailLevel.MINIMAL:
+            # Minimal detail level: just path and counts
+            return {
+                "path": self.path,
+                "file_count": len(self.files),
+                "subdirectory_count": len(self.subdirectories)
+            }
+        else:
+            # Standard and Detailed levels: include all information
+            return {
+                "path": self.path,
+                "files": self.files,
+                "subdirectories": self.subdirectories
+            }
     
     @classmethod
     def from_json(cls, data: Dict[str, Any]) -> 'DirectoryContent':
@@ -284,6 +360,14 @@ class DirectoryContent:
         Returns:
             DirectoryContent instance
         """
+        # Handle minimal detail level format
+        if "files" not in data:
+            return cls(
+                data["path"],
+                [],
+                []
+            )
+        
         return cls(
             data["path"],
             data.get("files", []),
@@ -331,12 +415,17 @@ class JSONMirrors:
         
         return os.path.join(mirror_dir, mirror_name)
     
-    def get_mirrored_content(self, source_path: str) -> Optional[Union[FileContent, DirectoryContent]]:
+    def get_mirrored_content(
+        self, 
+        source_path: str, 
+        detail_level: DetailLevel = DetailLevel.STANDARD
+    ) -> Optional[Union[FileContent, DirectoryContent]]:
         """
         Get the JSON representation of a source code file or directory.
         
         Args:
             source_path: Path to the source code file or directory
+            detail_level: The level of detail to include
             
         Returns:
             FileContent or DirectoryContent object, or None if not found
@@ -351,10 +440,22 @@ class JSONMirrors:
                 data = json.load(f)
             
             # Determine if this is a file or directory content
-            if "elements" in data:
-                return FileContent.from_json(data)
+            if "elements" in data or "element_count" in data:
+                content = FileContent.from_json(data)
+                
+                # If requested detail level is lower than stored detail, filter it
+                if detail_level == DetailLevel.MINIMAL and "elements" in data:
+                    return self._apply_minimal_detail_to_file_content(content)
+                
+                return content
             else:
-                return DirectoryContent.from_json(data)
+                content = DirectoryContent.from_json(data)
+                
+                # Filter if needed
+                if detail_level == DetailLevel.MINIMAL and "files" in data:
+                    return self._apply_minimal_detail_to_directory_content(content)
+                
+                return content
         except Exception as e:
             logger.error(f"Error reading mirrored content for {source_path}: {str(e)}")
             return None
@@ -362,7 +463,8 @@ class JSONMirrors:
     def update_mirrored_content(
         self, 
         source_path: str, 
-        content: Union[FileContent, DirectoryContent]
+        content: Union[FileContent, DirectoryContent],
+        detail_level: DetailLevel = DetailLevel.DETAILED
     ) -> None:
         """
         Update the JSON representation of a source code file or directory.
@@ -370,14 +472,16 @@ class JSONMirrors:
         Args:
             source_path: Path to the source code file or directory
             content: FileContent or DirectoryContent object
+            detail_level: The level of detail to include
         """
         mirror_path = self.get_mirror_path(source_path)
         
         try:
             with open(mirror_path, 'w', encoding='utf-8') as f:
-                json.dump(content.to_json(), f, indent=2)
+                # Serialize with the requested detail level
+                json.dump(content.to_json(detail_level), f, indent=2)
             
-            logger.debug(f"Updated mirrored content for {source_path}")
+            logger.debug(f"Updated mirrored content for {source_path} with detail level {detail_level.value}")
         except Exception as e:
             logger.error(f"Error updating mirrored content for {source_path}: {str(e)}")
             raise FileError(f"Failed to update mirrored content: {str(e)}")
@@ -455,7 +559,8 @@ class JSONMirrors:
         self,
         source_path: str,
         elements: Dict[str, CodeElement],
-        imports: List[str]
+        imports: List[str],
+        detail_level: DetailLevel = DetailLevel.DETAILED
     ) -> None:
         """
         Create a mirror for a source code file.
@@ -464,19 +569,21 @@ class JSONMirrors:
             source_path: Path to the source code file
             elements: Dictionary mapping element names to CodeElement objects
             imports: List of imported file paths
+            detail_level: The level of detail to include
         """
         abs_path = os.path.abspath(source_path)
         extension = os.path.splitext(abs_path)[1]
         source_hash = self.compute_file_hash(abs_path)
         
         file_content = FileContent(abs_path, extension, elements, imports, source_hash)
-        self.update_mirrored_content(abs_path, file_content)
+        self.update_mirrored_content(abs_path, file_content, detail_level)
     
     def create_directory_mirror(
         self,
         source_path: str,
         files: List[str],
-        subdirectories: List[str]
+        subdirectories: List[str],
+        detail_level: DetailLevel = DetailLevel.DETAILED
     ) -> None:
         """
         Create a mirror for a directory.
@@ -485,10 +592,11 @@ class JSONMirrors:
             source_path: Path to the directory
             files: List of file paths in the directory
             subdirectories: List of subdirectory paths in the directory
+            detail_level: The level of detail to include
         """
         abs_path = os.path.abspath(source_path)
         directory_content = DirectoryContent(abs_path, files, subdirectories)
-        self.update_mirrored_content(abs_path, directory_content)
+        self.update_mirrored_content(abs_path, directory_content, detail_level)
     
     def list_all_mirrors(self) -> List[str]:
         """
@@ -557,3 +665,41 @@ class JSONMirrors:
                 shutil.rmtree(item_path)
         
         logger.info("Cleared all JSONMirrors")
+    
+    def _apply_minimal_detail_to_file_content(self, content: FileContent) -> FileContent:
+        """
+        Apply minimal detail level filtering to a file content object.
+        
+        Args:
+            content: The file content to filter
+            
+        Returns:
+            Filtered file content
+        """
+        # Create minimal version with just counts
+        minimal_content = FileContent(
+            content.path,
+            content.extension,
+            {},  # Empty elements dict
+            [],  # Empty imports list
+            content.source_hash  # Preserve hash for up-to-date checks
+        )
+        return minimal_content
+    
+    def _apply_minimal_detail_to_directory_content(self, content: DirectoryContent) -> DirectoryContent:
+        """
+        Apply minimal detail level filtering to a directory content object.
+        
+        Args:
+            content: The directory content to filter
+            
+        Returns:
+            Filtered directory content
+        """
+        # Create minimal version with just the path
+        minimal_content = DirectoryContent(
+            content.path,
+            [],  # Empty files list
+            []   # Empty subdirectories list
+        )
+        return minimal_content

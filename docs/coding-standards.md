@@ -13,15 +13,14 @@ This document outlines the coding standards and best practices for the Architect
 - Write docstrings for all public functions, classes, and methods
 
 ### Formatting
-
-We use [Black](https://github.com/psf/black) as the code formatter with a line length of 88 characters:
+We use [Ruff](https://github.com/astral-sh/ruff) as the code formatter with a line length of 88 characters:
 
 ```bash
 # Format a single file
-black arch_blueprint_generator/module.py
+ruff format arch_blueprint_generator/module.py
 
 # Format the entire project
-black arch_blueprint_generator/
+ruff format arch_blueprint_generator/
 ```
 
 ### Import Order
