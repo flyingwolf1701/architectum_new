@@ -80,6 +80,24 @@ class Node:
             "metadata": self.metadata
         }
     
+    def __eq__(self, other):
+        """
+        Check if two nodes are equal.
+        
+        Args:
+            other: Node to compare with
+            
+        Returns:
+            True if nodes are equal, False otherwise
+        """
+        if not isinstance(other, Node):
+            return False
+            
+        return (
+            self.id == other.id and
+            self.type == other.type
+        )
+    
     @classmethod
     def from_json(cls, data: Dict[str, Any]) -> 'Node':
         """
@@ -432,6 +450,25 @@ class Relationship:
             "type": self.type.value,
             "metadata": self.metadata
         }
+    
+    def __eq__(self, other):
+        """
+        Check if two relationships are equal.
+        
+        Args:
+            other: Relationship to compare with
+            
+        Returns:
+            True if relationships are equal, False otherwise
+        """
+        if not isinstance(other, Relationship):
+            return False
+            
+        return (
+            self.source_id == other.source_id and
+            self.target_id == other.target_id and
+            self.type == other.type
+        )
     
     @classmethod
     def from_json(cls, data: Dict[str, Any]) -> 'Relationship':

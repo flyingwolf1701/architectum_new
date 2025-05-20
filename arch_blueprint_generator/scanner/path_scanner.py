@@ -45,7 +45,7 @@ class PathScanner:
         
         self.relationship_map = relationship_map or RelationshipMap()
         self.json_mirrors = json_mirrors or JSONMirrors(self.root_path)
-        self.exclude_patterns = exclude_patterns or [".git", ".venv", "__pycache__"]
+        self.exclude_patterns = exclude_patterns or [".git", ".venv", "__pycache__", ".architectum"]
         
         logger.info(f"Initialized PathScanner for {self.root_path}")
     
@@ -83,6 +83,9 @@ class PathScanner:
         
         logger.info(f"Scan completed: {self.relationship_map.node_count()} nodes, "
                     f"{self.relationship_map.relationship_count()} relationships")
+        
+        # Store the detail level in the relationship map for retrieval in to_json()
+        self.relationship_map.detail_level = detail_level
         
         return self.relationship_map, self.json_mirrors
     
