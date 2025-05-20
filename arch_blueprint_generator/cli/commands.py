@@ -4,8 +4,12 @@ Command-line interface for Architectum Blueprint Generator.
 
 import json
 import os
-import typer
+import glob
+import sys
+from enum import Enum
 from typing import List, Optional
+
+import typer
 from colorama import Fore, Style
 
 from arch_blueprint_generator.utils.logging import configure_logging, get_logger
@@ -14,18 +18,51 @@ from arch_blueprint_generator.models.detail_level import DetailLevel
 from arch_blueprint_generator.errors.exceptions import BlueprintError
 
 app = typer.Typer(help="Architectum Blueprint Generator")
+blueprint_app = typer.Typer(help="Generate blueprints from code.")
+app.add_typer(blueprint_app, name="blueprint")
 logger = get_logger(__name__)
+
+
+class OutputFormat(str, Enum):
+    """Supported output formats."""
+
+    JSON = "json"
+    XML = "xml"
+
+
+def error(message: str, exit_code: Optional[int] = None) -> None:
+    """Display an error message and optionally exit."""
+    typer.echo(f"{Fore.RED}Error: {message}{Style.RESET_ALL}", err=True)
+    if exit_code is not None:
+        raise typer.Exit(code=exit_code)
+
+
+def warning(message: str) -> None:
+    """Display a warning message."""
+    typer.echo(f"{Fore.YELLOW}Warning: {message}{Style.RESET_ALL}", err=True)
+
+
+def success(message: str) -> None:
+    """Display a success message."""
+    typer.echo(f"{Fore.GREEN}{message}{Style.RESET_ALL}")
+
+
+def debug(message: str) -> None:
+    """Display a debug message if debug mode is enabled."""
+    if "--debug" in sys.argv:
+        typer.echo(f"{Fore.BLUE}Debug: {message}{Style.RESET_ALL}", err=True)
 
 
 def version_callback(value: bool):
     """
     Display version information.
-    
+
     Args:
         value: Whether to display version information
     """
     if value:
         from arch_blueprint_generator import __version__
+
         typer.echo(f"Architectum Blueprint Generator v{__version__}")
         raise typer.Exit()
 
@@ -33,162 +70,148 @@ def version_callback(value: bool):
 @app.callback()
 def main(
     version: bool = typer.Option(
-        False, "--version", "-v", callback=version_callback, is_eager=True,
-        help="Show version information and exit."
+        False,
+        "--version",
+        "-v",
+        callback=version_callback,
+        is_eager=True,
+        help="Show version information and exit.",
     ),
-    verbose: bool = typer.Option(
-        False, "--verbose", help="Enable verbose output."
-    )
+    verbose: bool = typer.Option(False, "--verbose", help="Enable verbose output."),
 ):
     """
     Architectum Blueprint Generator - A tool for code comprehension.
     """
     import logging
+
     log_level = logging.DEBUG if verbose else logging.INFO
     configure_logging(log_level)
 
 
-@app.command()
-def blueprint(
+@blueprint_app.command("file")
+def blueprint_file(
     files: List[str] = typer.Argument(
-        None, 
-        help="List of files to include in blueprint"
+        ...,
+        help="File paths to include in the blueprint",
     ),
     output: str = typer.Option(
-        "-", 
-        "--output", "-o", 
-        help="Output file (- for stdout)"
+        "-",
+        "--output",
+        "-o",
+        help="Output file (- for stdout)",
     ),
-    format: str = typer.Option(
-        "json", 
-        "--format", "-f", 
-        help="Output format (json or xml)"
+    format: OutputFormat = typer.Option(
+        OutputFormat.JSON,
+        "--format",
+        "-f",
+        help="Output format",
     ),
     detail_level: str = typer.Option(
-        "standard", 
-        "--detail-level", "-d", 
-        help="Detail level (minimal, standard, detailed)"
+        "standard",
+        "--detail-level",
+        "-d",
+        help="Detail level (minimal, standard, detailed)",
     ),
-    name: Optional[str] = typer.Option(
-        None,
-        "--name", "-n",
-        help="Name for the blueprint"
+    pretty: bool = typer.Option(
+        True,
+        "--pretty/--compact",
+        help="Pretty print output",
     ),
-    type: str = typer.Option(
-        "file",
-        "--type", "-t",
-        help="Blueprint type (file, component, feature, temporary)"
-    )
+    sync: bool = typer.Option(
+        False,
+        "--sync",
+        help="Synchronize files before generating blueprint",
+    ),
 ) -> None:
-    """
-    Generate a blueprint from specified files.
-    
-    Creates a blueprint representation of the specified files with the chosen
-    detail level. The detail level controls how much information is included:
-    
-    - minimal: Basic structure information only
-    - standard: Essential information including types and basic attributes
-    - detailed: Comprehensive information including documentation
-    """
+    """Generate a File-Based Blueprint for specified files."""
     try:
-        # Check if files are provided
-        if not files:
-            typer.echo(f"{Fore.RED}Error: No files specified{Style.RESET_ALL}")
-            raise typer.Exit(code=1)
-        
-        # Convert string detail level to enum
+        resolved_files: List[str] = []
+        for pattern in files:
+            matches = glob.glob(pattern, recursive=True)
+            if not matches:
+                warning(f"No files match pattern '{pattern}'")
+            resolved_files.extend(matches)
+
+        if not resolved_files:
+            error("No valid files specified", exit_code=1)
+
         try:
-            detail = DetailLevel.from_string(detail_level)
+            dl = DetailLevel.from_string(detail_level)
         except ValueError as e:
-            typer.echo(f"{Fore.RED}Error: {str(e)}{Style.RESET_ALL}")
-            raise typer.Exit(code=1)
-        
-        # Normalize blueprint type
-        blueprint_type = type.lower()
-        if blueprint_type == "file":
-            blueprint_type = "FileBasedBlueprint"
-        else:
-            typer.echo(f"{Fore.RED}Error: Unsupported blueprint type: {type}{Style.RESET_ALL}")
-            typer.echo(f"Supported types: file")
-            raise typer.Exit(code=1)
-        
-        # Create scanner for the first file to ensure we have representations
-        first_file_dir = os.path.dirname(os.path.abspath(files[0]))
-        scanner = PathScanner(first_file_dir)
+            error(str(e), exit_code=1)
+
+        if sync:
+            from arch_blueprint_generator.sync.arch_sync import ArchSync
+
+            debug("Synchronizing files before blueprint generation")
+            sync_instance = ArchSync()
+            try:
+                sync_instance.sync(resolved_files, recursive=False, force=False)
+            except Exception as e:
+                warning(f"Synchronization failed: {str(e)}")
+
+        root_dir = os.path.commonpath(resolved_files)
+        scanner = PathScanner(root_dir)
         relationship_map, json_mirrors = scanner.scan()
-        
-        # Create blueprint factory
+
         from arch_blueprint_generator.blueprints.factory import BlueprintFactory
-        
-        # Create blueprint based on type
-        if blueprint_type == "FileBasedBlueprint":
-            blueprint = BlueprintFactory.create_file_blueprint(
-                relationship_map,
-                json_mirrors,
-                files,
-                name=name,
-                detail_level=detail
-            )
-        
-        # Generate blueprint content
+
+        blueprint = BlueprintFactory.create_file_blueprint(
+            relationship_map,
+            json_mirrors,
+            resolved_files,
+            detail_level=dl,
+        )
+
         blueprint.generate()
-        
-        # Output the blueprint
-        if output == "-":
-            # Print to stdout
-            if format.lower() == "json":
-                result = json.dumps(blueprint.to_json(), indent=2)
-                typer.echo(result)
-            elif format.lower() == "xml":
-                typer.echo(blueprint.to_xml())
-            else:
-                typer.echo(f"{Fore.RED}Error: Unsupported format: {format}{Style.RESET_ALL}")
-                typer.echo(f"Supported formats: json, xml")
-                raise typer.Exit(code=1)
+
+        if format == OutputFormat.JSON:
+            output_content = json.dumps(
+                blueprint.to_json(), indent=2 if pretty else None
+            )
         else:
-            # Save to file
-            blueprint.save(output, format)
-            typer.echo(f"{Fore.GREEN}Blueprint saved to: {output}{Style.RESET_ALL}")
-        
+            output_content = blueprint.to_xml()
+
+        if output == "-":
+            typer.echo(output_content)
+        else:
+            with open(output, "w", encoding="utf-8") as f:
+                f.write(output_content)
+            success(f"Blueprint written to {output}")
+
     except Exception as e:
-        typer.echo(f"{Fore.RED}Error generating blueprint: {str(e)}{Style.RESET_ALL}")
-        raise typer.Exit(code=1)
+        error(f"Error generating blueprint: {str(e)}", exit_code=1)
 
 
 @app.command()
 def scan(
-    path: str = typer.Argument(
-        ".", 
-        help="Path to scan"
-    ),
+    path: str = typer.Argument(".", help="Path to scan"),
     depth: int = typer.Option(
-        0, 
-        "--depth", "-d", 
-        help="Maximum depth to scan (0 for no limit)"
+        0, "--depth", "-d", help="Maximum depth to scan (0 for no limit)"
     ),
     output: str = typer.Option(
-        None, 
-        "--output", "-o", 
-        help="Output directory for saving representations"
+        None, "--output", "-o", help="Output directory for saving representations"
     ),
     exclude: List[str] = typer.Option(
-        [".git", ".venv", "__pycache__"], 
-        "--exclude", "-e", 
-        help="Patterns to exclude from scanning"
+        [".git", ".venv", "__pycache__"],
+        "--exclude",
+        "-e",
+        help="Patterns to exclude from scanning",
     ),
     detail_level: str = typer.Option(
-        "standard", 
-        "--detail-level", "-l", 
-        help="Detail level (minimal, standard, detailed)"
-    )
+        "standard",
+        "--detail-level",
+        "-l",
+        help="Detail level (minimal, standard, detailed)",
+    ),
 ) -> None:
     """
     Scan a directory path and generate both representations.
-    
+
     Creates both Relationship Map and JSON Mirrors representations
     for the specified path. The detail level controls how much
     information is included:
-    
+
     - minimal: Basic structure information only
     - standard: Essential information including types and basic attributes
     - detailed: Comprehensive information including documentation
@@ -200,41 +223,43 @@ def scan(
         except ValueError as e:
             typer.echo(f"{Fore.RED}Error: {str(e)}{Style.RESET_ALL}")
             raise typer.Exit(code=1)
-            
+
         # Create and run the path scanner
         scanner = PathScanner(path, exclude_patterns=exclude)
-        relationship_map, json_mirrors = scanner.scan(max_depth=depth, detail_level=detail)
-        
+        relationship_map, json_mirrors = scanner.scan(
+            max_depth=depth, detail_level=detail
+        )
+
         node_count = relationship_map.node_count()
         relationship_count = relationship_map.relationship_count()
-        
+
         typer.echo(f"{Fore.GREEN}Scan completed successfully:{Style.RESET_ALL}")
         typer.echo(f"Path: {os.path.abspath(path)}")
         typer.echo(f"Depth: {depth if depth > 0 else 'unlimited'}")
         typer.echo(f"Detail Level: {detail.value}")
         typer.echo(f"Nodes: {node_count}")
         typer.echo(f"Relationships: {relationship_count}")
-        
+
         # If output directory specified, save representations
         if output:
             output_dir = os.path.abspath(output)
             os.makedirs(output_dir, exist_ok=True)
-            
+
             # Save relationship map to JSON
             map_output = os.path.join(output_dir, "relationship_map.json")
-            with open(map_output, 'w', encoding='utf-8') as f:
+            with open(map_output, "w", encoding="utf-8") as f:
                 json.dump(relationship_map.to_json(detail), f, indent=2)
             typer.echo(f"Relationship map saved to: {map_output}")
-            
+
             # Save example of JSON mirrors structure
             mirrors_output = os.path.join(output_dir, "json_mirrors_paths.json")
-            with open(mirrors_output, 'w', encoding='utf-8') as f:
+            with open(mirrors_output, "w", encoding="utf-8") as f:
                 mirror_paths = json_mirrors.list_all_mirrors()
                 json.dump({"mirrored_files": mirror_paths}, f, indent=2)
             typer.echo(f"JSON mirrors paths saved to: {mirrors_output}")
-            
+
             typer.echo(f"JSON mirror files stored in: {json_mirrors.mirror_path}")
-            
+
     except Exception as e:
         typer.echo(f"{Fore.RED}Error scanning path: {str(e)}{Style.RESET_ALL}")
         raise typer.Exit(code=1)
@@ -242,35 +267,29 @@ def scan(
 
 @app.command()
 def sync(
-    path: str = typer.Argument(
-        ".", 
-        help="Path to synchronize"
-    ),
+    path: str = typer.Argument(".", help="Path to synchronize"),
     recursive: bool = typer.Option(
-        False, 
-        "--recursive", "-r", 
-        help="Recursively synchronize subdirectories"
+        False, "--recursive", "-r", help="Recursively synchronize subdirectories"
     ),
     force: bool = typer.Option(
-        False, 
-        "--force", 
-        help="Force synchronization even if files are up to date"
+        False, "--force", help="Force synchronization even if files are up to date"
     ),
     detail_level: str = typer.Option(
-        "standard", 
-        "--detail-level", "-l", 
-        help="Detail level (minimal, standard, detailed)"
-    )
+        "standard",
+        "--detail-level",
+        "-l",
+        help="Detail level (minimal, standard, detailed)",
+    ),
 ) -> None:
     """
     Synchronize code files with Architectum.
-    
+
     Updates both the Relationship Map and JSON Mirrors representations
     for the specified files or directories. Only changed files are
     processed by default, unless --force is specified.
-    
+
     The detail level controls how much information is included:
-    
+
     - minimal: Basic structure information only
     - standard: Essential information including types and basic attributes
     - detailed: Comprehensive information including documentation
@@ -282,26 +301,28 @@ def sync(
         except ValueError as e:
             typer.echo(f"{Fore.RED}Error: {str(e)}{Style.RESET_ALL}")
             raise typer.Exit(code=1)
-        
+
         # Create ArchSync instance
         from arch_blueprint_generator.sync.arch_sync import ArchSync
+
         sync_instance = ArchSync()
-        
+
         # Perform synchronization
         try:
             updated, added, removed = sync_instance.sync([path], recursive, force)
-            
-            typer.echo(f"{Fore.GREEN}Synchronization completed successfully:{Style.RESET_ALL}")
+
+            typer.echo(
+                f"{Fore.GREEN}Synchronization completed successfully:{Style.RESET_ALL}"
+            )
             typer.echo(f"Paths: {path}")
             typer.echo(f"Updated: {updated}, Added: {added}, Removed: {removed}")
             typer.echo(f"Detail level: {detail.value}")
         except Exception as e:
             typer.echo(f"{Fore.RED}Error synchronizing: {str(e)}{Style.RESET_ALL}")
             raise typer.Exit(code=1)
-            
+
     except Exception as e:
         typer.echo(f"{Fore.RED}Error synchronizing: {str(e)}{Style.RESET_ALL}")
-        raise typer.Exit(code=1)
         raise typer.Exit(code=1)
 
 

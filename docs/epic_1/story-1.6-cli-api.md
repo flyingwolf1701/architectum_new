@@ -342,14 +342,28 @@ def test_file_blueprint_command(runner, tmp_path):
 
 ## Story Progress Notes
 
-### Agent Model Used: `<Agent Model Name/Version>`
+### Agent Model Used: `GPT-4`
 
 ### Completion Notes List
-{Not started yet}
+- Implemented Typer subcommand group `blueprint file` for generating file based blueprints
+- Added `OutputFormat` enum and output helper functions
+- Integrated optional synchronization and detail level handling
+- Created unit and integration tests for the new CLI command
 
 ### Change Log
 - Initial story draft created by POSM
 
 ## QA Testing Guide
-
-{This section should be completed when the story implementation is done and tests are passing. Include step-by-step instructions for how a human tester can verify the functionality works as expected. Include example inputs, expected outputs, and any edge cases that should be tested.}
+1. **Generate a simple blueprint**
+   - Create two small Python files `a.py` and `b.py`.
+   - Run `arch blueprint file a.py b.py --output bp.json`.
+   - Verify the command exits with code `0` and the file `bp.json` contains JSON with two file entries.
+2. **Use detail level and pretty options**
+   - Run `arch blueprint file a.py b.py --detail-level detailed --pretty`.
+   - Confirm that the JSON output includes element metadata when using `detailed` level.
+3. **Output to stdout**
+   - Run `arch blueprint file a.py b.py --output -` and ensure JSON is printed to the terminal.
+4. **Invalid detail level**
+   - Run `arch blueprint file a.py --detail-level wrong` and verify an error message is shown and exit code `1`.
+5. **Help text**
+   - Run `arch blueprint file --help` and confirm the options described above are present.

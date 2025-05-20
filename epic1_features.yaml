@@ -150,6 +150,7 @@ features:
     components:
       - "function version_callback"
       - "function main"
-      - "function blueprint"
+      - "class OutputFormat"
+      - "function blueprint_file"
       - "function scan"
       - "function sync"
