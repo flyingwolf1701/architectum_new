@@ -16,6 +16,7 @@ from arch_blueprint_generator.errors.exceptions import BlueprintError
 # Create a concrete subclass for testing
 class TestBlueprint(Blueprint):
     """Concrete Blueprint subclass for testing."""
+    __test__ = False  # Prevent pytest from collecting this class as tests
     
     def __init__(
         self,

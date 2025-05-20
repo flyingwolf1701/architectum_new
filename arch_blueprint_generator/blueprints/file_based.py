@@ -58,7 +58,7 @@ class FileBasedBlueprint(Blueprint):
 
         # Validate file paths and remove or raise errors for invalid ones
         self._validate_file_paths()
-
+        
     def generate(self) -> None:
         """
         Generate a file-based blueprint.
