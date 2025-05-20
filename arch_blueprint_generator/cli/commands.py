@@ -11,6 +11,7 @@ from colorama import Fore, Style
 from arch_blueprint_generator.utils.logging import configure_logging, get_logger
 from arch_blueprint_generator.scanner.path_scanner import PathScanner
 from arch_blueprint_generator.models.detail_level import DetailLevel
+from arch_blueprint_generator.errors.exceptions import BlueprintError
 
 app = typer.Typer(help="Architectum Blueprint Generator")
 logger = get_logger(__name__)
@@ -67,6 +68,16 @@ def blueprint(
         "standard", 
         "--detail-level", "-d", 
         help="Detail level (minimal, standard, detailed)"
+    ),
+    name: Optional[str] = typer.Option(
+        None,
+        "--name", "-n",
+        help="Name for the blueprint"
+    ),
+    type: str = typer.Option(
+        "file",
+        "--type", "-t",
+        help="Blueprint type (file, component, feature, temporary)"
     )
 ) -> None:
     """
@@ -80,16 +91,65 @@ def blueprint(
     - detailed: Comprehensive information including documentation
     """
     try:
+        # Check if files are provided
+        if not files:
+            typer.echo(f"{Fore.RED}Error: No files specified{Style.RESET_ALL}")
+            raise typer.Exit(code=1)
+        
         # Convert string detail level to enum
         try:
             detail = DetailLevel.from_string(detail_level)
         except ValueError as e:
             typer.echo(f"{Fore.RED}Error: {str(e)}{Style.RESET_ALL}")
             raise typer.Exit(code=1)
-            
-        typer.echo(f"{Fore.YELLOW}Blueprint generation not yet implemented{Style.RESET_ALL}")
-        typer.echo(f"Would generate blueprint for files: {files}")
-        typer.echo(f"Output: {output}, Format: {format}, Detail Level: {detail.value}")
+        
+        # Normalize blueprint type
+        blueprint_type = type.lower()
+        if blueprint_type == "file":
+            blueprint_type = "FileBasedBlueprint"
+        else:
+            typer.echo(f"{Fore.RED}Error: Unsupported blueprint type: {type}{Style.RESET_ALL}")
+            typer.echo(f"Supported types: file")
+            raise typer.Exit(code=1)
+        
+        # Create scanner for the first file to ensure we have representations
+        first_file_dir = os.path.dirname(os.path.abspath(files[0]))
+        scanner = PathScanner(first_file_dir)
+        relationship_map, json_mirrors = scanner.scan()
+        
+        # Create blueprint factory
+        from arch_blueprint_generator.blueprints.factory import BlueprintFactory
+        
+        # Create blueprint based on type
+        if blueprint_type == "FileBasedBlueprint":
+            blueprint = BlueprintFactory.create_file_blueprint(
+                relationship_map,
+                json_mirrors,
+                files,
+                name=name,
+                detail_level=detail
+            )
+        
+        # Generate blueprint content
+        blueprint.generate()
+        
+        # Output the blueprint
+        if output == "-":
+            # Print to stdout
+            if format.lower() == "json":
+                result = json.dumps(blueprint.to_json(), indent=2)
+                typer.echo(result)
+            elif format.lower() == "xml":
+                typer.echo(blueprint.to_xml())
+            else:
+                typer.echo(f"{Fore.RED}Error: Unsupported format: {format}{Style.RESET_ALL}")
+                typer.echo(f"Supported formats: json, xml")
+                raise typer.Exit(code=1)
+        else:
+            # Save to file
+            blueprint.save(output, format)
+            typer.echo(f"{Fore.GREEN}Blueprint saved to: {output}{Style.RESET_ALL}")
+        
     except Exception as e:
         typer.echo(f"{Fore.RED}Error generating blueprint: {str(e)}{Style.RESET_ALL}")
         raise typer.Exit(code=1)
@@ -223,11 +283,25 @@ def sync(
             typer.echo(f"{Fore.RED}Error: {str(e)}{Style.RESET_ALL}")
             raise typer.Exit(code=1)
         
-        typer.echo(f"{Fore.YELLOW}Synchronization not yet implemented{Style.RESET_ALL}")
-        typer.echo(f"Would synchronize path: {path}")
-        typer.echo(f"Recursive: {recursive}, Force: {force}, Detail Level: {detail.value}")
+        # Create ArchSync instance
+        from arch_blueprint_generator.sync.arch_sync import ArchSync
+        sync_instance = ArchSync()
+        
+        # Perform synchronization
+        try:
+            updated, added, removed = sync_instance.sync([path], recursive, force)
+            
+            typer.echo(f"{Fore.GREEN}Synchronization completed successfully:{Style.RESET_ALL}")
+            typer.echo(f"Paths: {path}")
+            typer.echo(f"Updated: {updated}, Added: {added}, Removed: {removed}")
+            typer.echo(f"Detail level: {detail.value}")
+        except Exception as e:
+            typer.echo(f"{Fore.RED}Error synchronizing: {str(e)}{Style.RESET_ALL}")
+            raise typer.Exit(code=1)
+            
     except Exception as e:
         typer.echo(f"{Fore.RED}Error synchronizing: {str(e)}{Style.RESET_ALL}")
+        raise typer.Exit(code=1)
         raise typer.Exit(code=1)
 
 

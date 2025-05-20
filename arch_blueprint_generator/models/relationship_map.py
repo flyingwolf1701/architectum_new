@@ -38,6 +38,7 @@ class RelationshipMap:
         self.nodes_by_type: Dict[NodeType, Dict[str, Node]] = {
             node_type: {} for node_type in NodeType
         }
+        self.detail_level = DetailLevel.STANDARD
         logger.info("Initialized empty RelationshipMap")
     
     def add_node(self, node: Node) -> None:

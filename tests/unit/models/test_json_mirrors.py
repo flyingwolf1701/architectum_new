@@ -32,7 +32,9 @@ class TestCodeElement:
         """Test converting a code element to JSON."""
         element = CodeElement("my_function", "function", 10, 20, {"key": "value"})
         
-        json_data = element.to_json()
+        # Call to_json with DETAILED level to get all metadata
+        from arch_blueprint_generator.models.detail_level import DetailLevel
+        json_data = element.to_json(DetailLevel.DETAILED)
         
         assert json_data["name"] == "my_function"
         assert json_data["type"] == "function"

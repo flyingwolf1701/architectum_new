@@ -101,7 +101,7 @@ class TestPathScannerDetailLevel:
         assert relationship_map.relationship_count() > 0
         
         # Get a JSON representation of the relationship map
-        json_data = relationship_map.to_json()
+        json_data = relationship_map.to_json(detail_level=DetailLevel.DETAILED)
         
         # Check that detail level is included
         assert "detail_level" in json_data
@@ -122,8 +122,8 @@ class TestPathScannerDetailLevel:
         relationship_map_detailed, _ = scanner.scan(detail_level=DetailLevel.DETAILED)
         
         # Serialize both maps to JSON
-        json_minimal = relationship_map_minimal.to_json()
-        json_detailed = relationship_map_detailed.to_json()
+        json_minimal = relationship_map_minimal.to_json(detail_level=DetailLevel.MINIMAL)
+        json_detailed = relationship_map_detailed.to_json(detail_level=DetailLevel.DETAILED)
         
         # Check that both have the correct detail level
         assert json_minimal["detail_level"] == "minimal"
