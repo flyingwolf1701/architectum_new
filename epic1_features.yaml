@@ -1,6 +1,17 @@
 ---
 epic: "Core Blueprint Generation Framework"
 features:
+  - name: "Detail Level Configuration"
+    description: "Configurable detail level system for controlling the granularity of information in representations"
+    path: "arch_blueprint_generator/models/detail_level.py"
+    components:
+      - "enum DetailLevel"
+      - "class DetailLevelConfig"
+      - "method from_string"
+      - "method to_dict"
+      - "method from_dict"
+      - "method uniform"
+
   - name: "Relationship Map"
     description: "Graph model capturing relationships between code elements, providing efficient navigation and querying"
     path: "arch_blueprint_generator/models/relationship_map.py"
@@ -30,6 +41,8 @@ features:
       - "method from_json"
       - "method save"
       - "method load"
+      - "method _apply_detail_level_to_node"
+      - "method _apply_detail_level_to_relationship"
 
   - name: "Nodes and Relationships"
     description: "Core data structures for representing code elements and their relationships"
@@ -74,6 +87,8 @@ features:
       - "method list_all_mirrors"
       - "method scan_directory"
       - "method clear"
+      - "method _apply_minimal_detail_to_file_content"
+      - "method _apply_minimal_detail_to_directory_content"
 
   - name: "Path Scanner"
     description: "Scans directory structures to generate both Relationship Map and JSON Mirrors representations"

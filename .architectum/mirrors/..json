@@ -1,13 +1,18 @@
 {
   "path": "D:\\Coding\\2025\\architectum_new",
   "files": [
+    "D:\\Coding\\2025\\architectum_new\\.coverage",
+    "D:\\Coding\\2025\\architectum_new\\.python-version",
     "D:\\Coding\\2025\\architectum_new\\epic1_features.yaml",
     "D:\\Coding\\2025\\architectum_new\\main.py",
     "D:\\Coding\\2025\\architectum_new\\pyproject.toml",
     "D:\\Coding\\2025\\architectum_new\\README.md",
+    "D:\\Coding\\2025\\architectum_new\\scan_test.py",
     "D:\\Coding\\2025\\architectum_new\\uv.lock"
   ],
   "subdirectories": [
+    "D:\\Coding\\2025\\architectum_new\\.architectum",
+    "D:\\Coding\\2025\\architectum_new\\.pytest_cache",
     "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator",
     "D:\\Coding\\2025\\architectum_new\\bmad-method",
     "D:\\Coding\\2025\\architectum_new\\docs",

@@ -10,7 +10,7 @@ from arch_blueprint_generator.models.relationship_map import RelationshipMap
 from arch_blueprint_generator.models.json_mirrors import JSONMirrors
 from arch_blueprint_generator.models.detail_level import DetailLevel, DetailLevelConfig
 from arch_blueprint_generator.models.nodes import (
-    FileNode, DirectoryNode, ContainsRelationship
+    FileNode, DirectoryNode, ContainsRelationship, NodeType
 )
 from arch_blueprint_generator.errors.exceptions import FileError
 from arch_blueprint_generator.utils.logging import get_logger
@@ -96,8 +96,8 @@ class PathScanner:
         nodes_to_remove = []
         
         # Find directory and file nodes that start with the path
-        for node_type in [DirectoryNode, FileNode]:
-            for node in self.relationship_map.get_nodes_by_type(node_type):
+        for node_type_enum in [NodeType.DIRECTORY, NodeType.FILE]:
+            for node in self.relationship_map.get_nodes_by_type(node_type_enum):
                 if hasattr(node, 'path') and node.path.startswith(path):
                     nodes_to_remove.append(node.id)
         
