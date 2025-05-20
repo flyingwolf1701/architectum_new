@@ -158,8 +158,30 @@ class TestFileBasedBlueprint:
             json_mirrors,
             ["non_existent_file.py"]
         )
-        
+
         assert blueprint.file_paths == [os.path.abspath("non_existent_file.py")]
+
+    def test_init_all_invalid_paths(self, relationship_map, json_mirrors):
+        """All invalid paths should raise an error."""
+        with pytest.raises(BlueprintError):
+            FileBasedBlueprint(
+                relationship_map,
+                json_mirrors,
+                ["bad1.py", "bad2.py"]
+            )
+
+    def test_init_some_invalid_paths(self, relationship_map, json_mirrors, test_file_paths):
+        """Invalid paths are removed when at least one valid path exists."""
+        valid_path = test_file_paths[0]
+        invalid_path = "does_not_exist.py"
+
+        blueprint = FileBasedBlueprint(
+            relationship_map,
+            json_mirrors,
+            [valid_path, invalid_path]
+        )
+
+        assert blueprint.file_paths == [os.path.abspath(valid_path)]
     
     def test_generate(self, blueprint):
         """Test generating a file-based blueprint."""
