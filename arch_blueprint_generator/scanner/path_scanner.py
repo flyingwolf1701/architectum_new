@@ -84,10 +84,12 @@ class PathScanner:
         Args:
             path: Path to clean nodes for
         """
+        from arch_blueprint_generator.models.nodes import NodeType
+        
         nodes_to_remove = []
         
         # Find directory and file nodes that start with the path
-        for node_type in [DirectoryNode, FileNode]:
+        for node_type in [NodeType.DIRECTORY, NodeType.FILE]:
             for node in self.relationship_map.get_nodes_by_type(node_type):
                 if hasattr(node, 'path') and node.path.startswith(path):
                     nodes_to_remove.append(node.id)
@@ -186,6 +188,10 @@ class PathScanner:
         # Filter out excluded patterns
         filtered_items = []
         for item in all_items:
+            # Always skip .architectum directories
+            if item == ".architectum":
+                continue
+                
             skip = False
             for pattern in self.exclude_patterns:
                 if pattern in item:  # Simple string matching for now

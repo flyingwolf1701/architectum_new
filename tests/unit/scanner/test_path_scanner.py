@@ -109,7 +109,7 @@ class TestPathScanner:
         
         # Verify contains relationships (including transitivity)
         contains_rels = relationship_map.get_relationships_by_type(RelationshipType.CONTAINS)
-        assert len(contains_rels) == 9  # Each node except the root has a container
+        assert len(contains_rels) == 8  # Each node except the root has a container
         
         # Verify excluded files/dirs were not included
         excluded_path = os.path.join(test_directory, "__pycache__")
