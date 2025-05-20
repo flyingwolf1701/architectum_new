@@ -55,18 +55,9 @@ class FileBasedBlueprint(Blueprint):
             raise BlueprintError("At least one file path must be specified")
         
         self.file_paths = [os.path.abspath(path) for path in file_paths]
-        
-        # Validate file paths
-        for path in self.file_paths:
-            # Check if file exists in either representation
-            file_node_id = f"file:{path}"
-            file_node = self.relationship_map.get_node(file_node_id)
-            mirror_exists = self.json_mirrors.exists(path)
-            
-            if not file_node and not mirror_exists:
-                logger.warning(f"File not found in either representation: {path}")
-                # We'll continue with a warning but not raise an error
-                # This allows for generating blueprints with partial information
+
+        # Validate file paths and remove or raise errors for invalid ones
+        self._validate_file_paths()
     
     def generate(self) -> None:
         """
@@ -249,3 +240,34 @@ class FileBasedBlueprint(Blueprint):
                         relationships[-1]["metadata"] = rel.metadata
         
         self.content["relationships"] = relationships
+
+    def _validate_file_paths(self) -> None:
+        """Validate provided file paths and handle invalid ones."""
+        invalid_paths = []
+        for path in self.file_paths:
+            if not self._is_valid_file_path(path):
+                invalid_paths.append(path)
+
+        if invalid_paths:
+            if len(invalid_paths) == len(self.file_paths):
+                raise BlueprintError(
+                    f"All specified file paths are invalid: {invalid_paths}"
+                )
+            logger.warning(
+                f"Some file paths are invalid and will be skipped: {invalid_paths}"
+            )
+            self.file_paths = [p for p in self.file_paths if p not in invalid_paths]
+
+    def _is_valid_file_path(self, path: str) -> bool:
+        """Return True if the file path is valid in any representation."""
+        if os.path.isfile(path) and os.access(path, os.R_OK):
+            return True
+
+        file_node_id = f"file:{path}"
+        if self.relationship_map.get_node(file_node_id):
+            return True
+
+        if self.json_mirrors.exists(path):
+            return True
+
+        return False

@@ -1,6 +1,6 @@
 # Story 1.5: Implement Basic File-Based Blueprint Generation
 
-## Status: Draft
+## Status: Completed
 
 ## Story
 
@@ -24,38 +24,38 @@
   - Detail Level Testing: Verify blueprint content varies appropriately with detail level settings
 ## Tasks / Subtasks
 
-- [ ] Design and implement the Blueprint base class (AC: 2)
-  - [ ] Create blueprint interface with the Relationship Map and JSON Mirrors
-  - [ ] Implement blueprint serialization to JSON format
-  - [ ] Create methods for merging data from both representations
-  - [ ] Implement utility methods for blueprint generation and validation
+- [x] Design and implement the Blueprint base class (AC: 2)
+  - [x] Create blueprint interface with the Relationship Map and JSON Mirrors
+  - [x] Implement blueprint serialization to JSON format
+  - [x] Create methods for merging data from both representations
+  - [x] Implement utility methods for blueprint generation and validation
 
-- [ ] Implement File-Based Blueprint generator (AC: 1, 2, 3)
-  - [ ] Create FileBasedBlueprint class extending Blueprint base class
-  - [ ] Implement logic to extract relevant nodes/relationships from the Relationship Map
-  - [ ] Implement logic to extract relevant content from JSON Mirrors
-  - [ ] Create method to combine data from both sources into unified blueprint
-  - [ ] Ensure relationships between specified files are preserved
+- [x] Implement File-Based Blueprint generator (AC: 1, 2, 3)
+  - [x] Create FileBasedBlueprint class extending Blueprint base class
+  - [x] Implement logic to extract relevant nodes/relationships from the Relationship Map
+  - [x] Implement logic to extract relevant content from JSON Mirrors
+  - [x] Create method to combine data from both sources into unified blueprint
+  - [x] Ensure relationships between specified files are preserved
 
-- [ ] Implement detail level support for blueprints (AC: 4)
-  - [ ] Integrate detail level configuration with blueprint generation
-  - [ ] Ensure detail level settings affect both Relationship Map and JSON Mirrors extraction
-  - [ ] Implement logic to filter blueprint content based on detail level
-  - [ ] Create tests to verify behavior across different detail levels
+- [x] Implement detail level support for blueprints (AC: 4)
+  - [x] Integrate detail level configuration with blueprint generation
+  - [x] Ensure detail level settings affect both Relationship Map and JSON Mirrors extraction
+  - [x] Implement logic to filter blueprint content based on detail level
+  - [x] Create tests to verify behavior across different detail levels
 
-- [ ] Implement error handling and validation (AC: 5)
-  - [ ] Create validation for file paths before blueprint generation
-  - [ ] Implement graceful handling of invalid or inaccessible files
-  - [ ] Create clear error messages for various failure scenarios
-  - [ ] Ensure blueprint generation works with partial valid inputs
+- [x] Implement error handling and validation (AC: 5)
+  - [x] Create validation for file paths before blueprint generation
+  - [x] Implement graceful handling of invalid or inaccessible files
+  - [x] Create clear error messages for various failure scenarios
+  - [x] Ensure blueprint generation works with partial valid inputs
 
-- [ ] Create comprehensive testing suite (AC: 6)
-  - [ ] Create unit tests for blueprint generation with various file combinations
-  - [ ] Implement snapshot tests to verify output formats and content
-  - [ ] Create contract tests to ensure schema compliance
-  - [ ] Test error handling with invalid inputs
-  - [ ] Create tests for detail level variations
-  - [ ] Generate test coverage report to ensure 80% minimum coverage
+- [x] Create comprehensive testing suite (AC: 6)
+  - [x] Create unit tests for blueprint generation with various file combinations
+  - [x] Implement snapshot tests to verify output formats and content
+  - [x] Create contract tests to ensure schema compliance
+  - [x] Test error handling with invalid inputs
+  - [x] Create tests for detail level variations
+  - [x] Generate test coverage report to ensure 80% minimum coverage
 ## Dev Technical Guidance
 
 ### Blueprint Base Class Design
@@ -318,14 +318,31 @@ Focus on comprehensive testing of blueprint generation:
 
 ## Story Progress Notes
 
-### Agent Model Used: `<Agent Model Name/Version>`
+### Agent Model Used: `GPT-4`
 
 ### Completion Notes List
-{Not started yet}
+- Implemented Blueprint base class with JSON and XML serialization.
+- Added FileBasedBlueprint to merge Relationship Map and JSON Mirrors.
+- Integrated detail level configuration and filtering logic.
+- Implemented validation for file paths with graceful handling of partial input.
+- Added unit and integration tests including snapshot coverage.
 
 ### Change Log
 - Initial story draft created by POSM
+- 2025-05-21: Story implemented and tests added
 
 ## QA Testing Guide
+1. Run `pytest` in the project root to execute the unit, integration and snapshot tests. All tests should pass.
+2. From a Python shell, create a simple blueprint:
+   ```python
+   from arch_blueprint_generator.models.relationship_map import RelationshipMap
+   from arch_blueprint_generator.models.json_mirrors import JSONMirrors
+   from arch_blueprint_generator.blueprints.factory import BlueprintFactory
 
-{This section should be completed when the story implementation is done and tests are passing. Include step-by-step instructions for how a human tester can verify the functionality works as expected. Include example inputs, expected outputs, and any edge cases that should be tested.}
+   rm = RelationshipMap()
+   jm = JSONMirrors("/path/to/code")
+   blueprint = BlueprintFactory.create_file_blueprint(rm, jm, ["example.py"])
+   blueprint.generate()
+   print(blueprint.to_json())
+   ```
+3. Verify the output JSON lists the file, its elements and any relationships. Try passing a missing file path to confirm a warning is logged and the blueprint still generates for valid paths.
