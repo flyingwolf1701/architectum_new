@@ -124,6 +124,16 @@ class TestArchSync:
         
         # Verify file is in the JSON mirrors
         assert arch_sync.json_mirrors.exists(test_files["file1"]) is True
+
+    def test_force_rescan_single_file_only_updates_specified_file(self, arch_sync, test_files):
+        """Force rescan of a single file should not scan sibling files."""
+        arch_sync.sync([test_files["file1"]], False, True)
+
+        # Ensure other files were not added
+        file2_node_id = f"file:{test_files['file2']}"
+        subfile_node_id = f"file:{test_files['subfile']}"
+        assert arch_sync.relationship_map.get_node(file2_node_id) is None
+        assert arch_sync.relationship_map.get_node(subfile_node_id) is None
     
     def test_sync_modified_file(self, arch_sync, test_files):
         """Test synchronizing a modified file."""

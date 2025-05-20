@@ -26,6 +26,10 @@
    - Added .architectum to excluded directories
    - Fixed the relationship_map.to_json method to include the detail_level from the scanner
 
+6. **Force Rescanning a File Added Siblings**
+   - Updated ArchSync to clean and re-add only the specified file during a force rescan
+   - Added a regression test to ensure sibling files are not unintentionally scanned
+
 ## Files Modified
 
 1. `arch_blueprint_generator/models/relationship_map.py`
@@ -52,6 +56,12 @@
 
 7. `tests/unit/models/test_json_mirrors.py`
    - Updated test_to_json to use DetailLevel.DETAILED
+
+8. `arch_blueprint_generator/sync/arch_sync.py`
+   - Fixed force rescan so only the specified file is reprocessed
+
+9. `tests/unit/sync/test_arch_sync.py`
+   - Added regression test for single-file force rescan
 
 ## Verification
 
