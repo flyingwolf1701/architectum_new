@@ -8,6 +8,7 @@ from typing import Optional, List, Dict, Any, Tuple, Iterator, Set
 
 from arch_blueprint_generator.models.relationship_map import RelationshipMap
 from arch_blueprint_generator.models.json_mirrors import JSONMirrors
+from arch_blueprint_generator.models.detail_level import DetailLevel, DetailLevelConfig
 from arch_blueprint_generator.models.nodes import (
     FileNode, DirectoryNode, ContainsRelationship
 )
@@ -48,17 +49,25 @@ class PathScanner:
         
         logger.info(f"Initialized PathScanner for {self.root_path}")
     
-    def scan(self, max_depth: int = 0) -> Tuple[RelationshipMap, JSONMirrors]:
+    def scan(
+        self, 
+        max_depth: int = 0, 
+        detail_level: DetailLevel = DetailLevel.STANDARD
+    ) -> Tuple[RelationshipMap, JSONMirrors]:
         """
         Scan the directory structure and generate both representations.
         
         Args:
             max_depth: Maximum depth to scan (0 for no limit)
+            detail_level: The level of detail to include
             
         Returns:
             Tuple of (RelationshipMap, JSONMirrors)
         """
-        logger.info(f"Starting scan of {self.root_path} with max_depth={max_depth}")
+        logger.info(f"Starting scan of {self.root_path} with max_depth={max_depth}, detail_level={detail_level.value}")
+        
+        # Create detail level configuration
+        detail_config = DetailLevelConfig.uniform(detail_level)
         
         # Clear existing data that might overlap with this scan
         # (only for nodes within the scanned path)
@@ -70,7 +79,7 @@ class PathScanner:
         self.relationship_map.add_node(root_dir_node)
         
         # Start recursive scanning
-        self._scan_directory(self.root_path, root_node_id, 0, max_depth)
+        self._scan_directory(self.root_path, root_node_id, 0, max_depth, detail_config)
         
         logger.info(f"Scan completed: {self.relationship_map.node_count()} nodes, "
                     f"{self.relationship_map.relationship_count()} relationships")
@@ -84,12 +93,10 @@ class PathScanner:
         Args:
             path: Path to clean nodes for
         """
-        from arch_blueprint_generator.models.nodes import NodeType
-        
         nodes_to_remove = []
         
         # Find directory and file nodes that start with the path
-        for node_type in [NodeType.DIRECTORY, NodeType.FILE]:
+        for node_type in [DirectoryNode, FileNode]:
             for node in self.relationship_map.get_nodes_by_type(node_type):
                 if hasattr(node, 'path') and node.path.startswith(path):
                     nodes_to_remove.append(node.id)
@@ -102,7 +109,12 @@ class PathScanner:
                 logger.warning(f"Failed to remove node {node_id}: {str(e)}")
     
     def _scan_directory(
-        self, directory: str, parent_node_id: str, current_depth: int, max_depth: int
+        self, 
+        directory: str, 
+        parent_node_id: str, 
+        current_depth: int, 
+        max_depth: int,
+        detail_config: DetailLevelConfig
     ) -> None:
         """
         Recursively scan a directory and its contents.
@@ -112,6 +124,7 @@ class PathScanner:
             parent_node_id: ID of the parent node in the relationship map
             current_depth: Current scan depth
             max_depth: Maximum depth to scan (0 for no limit)
+            detail_config: Detail level configuration
         """
         if max_depth > 0 and current_depth >= max_depth:
             logger.debug(f"Reached max depth at {directory}")
@@ -131,7 +144,8 @@ class PathScanner:
             self.json_mirrors.create_directory_mirror(
                 directory, 
                 [os.path.join(directory, f) for f in files],
-                [os.path.join(directory, d) for d in subdirs]
+                [os.path.join(directory, d) for d in subdirs],
+                detail_config.json_mirrors
             )
         except Exception as e:
             logger.error(f"Error creating directory mirror for {directory}: {str(e)}")
@@ -151,7 +165,7 @@ class PathScanner:
                 self.relationship_map.add_relationship(contains_rel)
                 
                 # Recursively scan subdirectory
-                self._scan_directory(item_path, subdir_node_id, current_depth + 1, max_depth)
+                self._scan_directory(item_path, subdir_node_id, current_depth + 1, max_depth, detail_config)
             
             elif os.path.isfile(item_path):
                 # Create node for file
@@ -166,7 +180,12 @@ class PathScanner:
                 
                 # Create JSON mirror for the file (basic version without detailed parsing)
                 try:
-                    self.json_mirrors.create_file_mirror(item_path, {}, [])
+                    self.json_mirrors.create_file_mirror(
+                        item_path,
+                        {},  # Empty elements dict for now
+                        [],  # Empty imports list for now
+                        detail_config.json_mirrors
+                    )
                 except Exception as e:
                     logger.error(f"Error creating file mirror for {item_path}: {str(e)}")
     
@@ -188,10 +207,6 @@ class PathScanner:
         # Filter out excluded patterns
         filtered_items = []
         for item in all_items:
-            # Always skip .architectum directories
-            if item == ".architectum":
-                continue
-                
             skip = False
             for pattern in self.exclude_patterns:
                 if pattern in item:  # Simple string matching for now

@@ -7,6 +7,7 @@ import os
 import networkx as nx
 from typing import Dict, List, Set, Optional, Any, Union, Tuple, Iterator, TypeVar
 import pickle
+import copy
 
 from arch_blueprint_generator.models.nodes import (
     Node, Relationship, NodeType, RelationshipType,
@@ -14,6 +15,7 @@ from arch_blueprint_generator.models.nodes import (
     ContainsRelationship, CallsRelationship, ImportsRelationship, 
     InheritsRelationship, ImplementsRelationship
 )
+from arch_blueprint_generator.models.detail_level import DetailLevel
 from arch_blueprint_generator.errors.exceptions import ModelError
 from arch_blueprint_generator.utils.logging import get_logger
 
@@ -81,12 +83,13 @@ class RelationshipMap:
             f"{relationship.target_id} ({relationship.type.value})"
         )
     
-    def get_node(self, node_id: str) -> Optional[Node]:
+    def get_node(self, node_id: str, detail_level: DetailLevel = DetailLevel.STANDARD) -> Optional[Node]:
         """
-        Get a node by ID.
+        Get a node by ID with the specified detail level.
         
         Args:
             node_id: The ID of the node to get
+            detail_level: The level of detail to include
             
         Returns:
             The node, or None if not found
@@ -94,27 +97,31 @@ class RelationshipMap:
         if node_id not in self.graph:
             return None
         
-        return self.graph.nodes[node_id]["node"]
+        node = self.graph.nodes[node_id]["node"]
+        return self._apply_detail_level_to_node(node, detail_level)
     
-    def get_nodes_by_type(self, node_type: NodeType) -> List[Node]:
+    def get_nodes_by_type(self, node_type: NodeType, detail_level: DetailLevel = DetailLevel.STANDARD) -> List[Node]:
         """
-        Get all nodes of a specific type.
+        Get all nodes of a specific type with the specified detail level.
         
         Args:
             node_type: The type of nodes to get
+            detail_level: The level of detail to include
             
         Returns:
             List of nodes of the specified type
         """
-        return list(self.nodes_by_type[node_type].values())
+        nodes = list(self.nodes_by_type[node_type].values())
+        return [self._apply_detail_level_to_node(node, detail_level) for node in nodes]
     
-    def get_relationship(self, source_id: str, target_id: str) -> Optional[Relationship]:
+    def get_relationship(self, source_id: str, target_id: str, detail_level: DetailLevel = DetailLevel.STANDARD) -> Optional[Relationship]:
         """
-        Get a relationship by source and target node IDs.
+        Get a relationship by source and target node IDs with the specified detail level.
         
         Args:
             source_id: The ID of the source node
             target_id: The ID of the target node
+            detail_level: The level of detail to include
             
         Returns:
             The relationship, or None if not found
@@ -122,14 +129,16 @@ class RelationshipMap:
         if not self.graph.has_edge(source_id, target_id):
             return None
         
-        return self.graph.edges[source_id, target_id]["relationship"]
+        relationship = self.graph.edges[source_id, target_id]["relationship"]
+        return self._apply_detail_level_to_relationship(relationship, detail_level)
     
-    def get_outgoing_relationships(self, node_id: str) -> List[Relationship]:
+    def get_outgoing_relationships(self, node_id: str, detail_level: DetailLevel = DetailLevel.STANDARD) -> List[Relationship]:
         """
-        Get all outgoing relationships from a node.
+        Get all outgoing relationships from a node with the specified detail level.
         
         Args:
             node_id: The ID of the node
+            detail_level: The level of detail to include
             
         Returns:
             List of outgoing relationships
@@ -142,16 +151,18 @@ class RelationshipMap:
         
         relationships = []
         for _, target_id in self.graph.out_edges(node_id):
-            relationships.append(self.graph.edges[node_id, target_id]["relationship"])
+            relationship = self.graph.edges[node_id, target_id]["relationship"]
+            relationships.append(self._apply_detail_level_to_relationship(relationship, detail_level))
         
         return relationships
     
-    def get_incoming_relationships(self, node_id: str) -> List[Relationship]:
+    def get_incoming_relationships(self, node_id: str, detail_level: DetailLevel = DetailLevel.STANDARD) -> List[Relationship]:
         """
-        Get all incoming relationships to a node.
+        Get all incoming relationships to a node with the specified detail level.
         
         Args:
             node_id: The ID of the node
+            detail_level: The level of detail to include
             
         Returns:
             List of incoming relationships
@@ -164,16 +175,18 @@ class RelationshipMap:
         
         relationships = []
         for source_id, _ in self.graph.in_edges(node_id):
-            relationships.append(self.graph.edges[source_id, node_id]["relationship"])
+            relationship = self.graph.edges[source_id, node_id]["relationship"]
+            relationships.append(self._apply_detail_level_to_relationship(relationship, detail_level))
         
         return relationships
     
-    def get_relationships_by_type(self, relationship_type: RelationshipType) -> List[Relationship]:
+    def get_relationships_by_type(self, relationship_type: RelationshipType, detail_level: DetailLevel = DetailLevel.STANDARD) -> List[Relationship]:
         """
-        Get all relationships of a specific type.
+        Get all relationships of a specific type with the specified detail level.
         
         Args:
             relationship_type: The type of relationships to get
+            detail_level: The level of detail to include
             
         Returns:
             List of relationships of the specified type
@@ -182,7 +195,7 @@ class RelationshipMap:
         for source_id, target_id, data in self.graph.edges(data=True):
             relationship = data["relationship"]
             if relationship.type == relationship_type:
-                relationships.append(relationship)
+                relationships.append(self._apply_detail_level_to_relationship(relationship, detail_level))
         
         return relationships
     
@@ -269,12 +282,13 @@ class RelationshipMap:
         
         return counts
     
-    def get_subgraph(self, node_ids: List[str]) -> 'RelationshipMap':
+    def get_subgraph(self, node_ids: List[str], detail_level: DetailLevel = DetailLevel.STANDARD) -> 'RelationshipMap':
         """
-        Create a subgraph containing specified nodes and their relationships.
+        Create a subgraph containing specified nodes and their relationships with the specified detail level.
         
         Args:
             node_ids: IDs of nodes to include in the subgraph
+            detail_level: The level of detail to include
             
         Returns:
             New RelationshipMap containing the subgraph
@@ -288,25 +302,28 @@ class RelationshipMap:
         
         subgraph = RelationshipMap()
         
-        # Add nodes
+        # Add nodes with appropriate detail level
         for node_id in node_ids:
             node = self.graph.nodes[node_id]["node"]
-            subgraph.add_node(node)
+            filtered_node = self._apply_detail_level_to_node(node, detail_level)
+            subgraph.add_node(filtered_node)
         
-        # Add relationships between nodes in the subgraph
+        # Add relationships between nodes in the subgraph with appropriate detail level
         for source_id in node_ids:
             for target_id in node_ids:
                 if self.graph.has_edge(source_id, target_id):
                     relationship = self.graph.edges[source_id, target_id]["relationship"]
-                    subgraph.add_relationship(relationship)
+                    filtered_relationship = self._apply_detail_level_to_relationship(relationship, detail_level)
+                    subgraph.add_relationship(filtered_relationship)
         
         return subgraph
     
-    def find_nodes(self, **filters) -> List[Node]:
+    def find_nodes(self, detail_level: DetailLevel = DetailLevel.STANDARD, **filters) -> List[Node]:
         """
-        Find nodes matching specified filters.
+        Find nodes matching specified filters with the specified detail level.
         
         Args:
+            detail_level: The level of detail to include
             **filters: Attributes to filter by
             
         Returns:
@@ -333,15 +350,16 @@ class RelationshipMap:
                     break
             
             if match:
-                result.append(node)
+                result.append(self._apply_detail_level_to_node(node, detail_level))
         
         return result
     
-    def find_relationships(self, **filters) -> List[Relationship]:
+    def find_relationships(self, detail_level: DetailLevel = DetailLevel.STANDARD, **filters) -> List[Relationship]:
         """
-        Find relationships matching specified filters.
+        Find relationships matching specified filters with the specified detail level.
         
         Args:
+            detail_level: The level of detail to include
             **filters: Attributes to filter by
             
         Returns:
@@ -380,17 +398,18 @@ class RelationshipMap:
                     break
             
             if match:
-                result.append(relationship)
+                result.append(self._apply_detail_level_to_relationship(relationship, detail_level))
         
         return result
     
-    def shortest_path(self, source_id: str, target_id: str) -> List[Node]:
+    def shortest_path(self, source_id: str, target_id: str, detail_level: DetailLevel = DetailLevel.STANDARD) -> List[Node]:
         """
-        Find the shortest path between two nodes.
+        Find the shortest path between two nodes with the specified detail level.
         
         Args:
             source_id: ID of the source node
             target_id: ID of the target node
+            detail_level: The level of detail to include
             
         Returns:
             List of nodes representing the shortest path
@@ -407,7 +426,8 @@ class RelationshipMap:
         
         try:
             path = nx.shortest_path(self.graph, source_id, target_id)
-            return [self.graph.nodes[node_id]["node"] for node_id in path]
+            return [self._apply_detail_level_to_node(self.graph.nodes[node_id]["node"], detail_level) 
+                    for node_id in path]
         except nx.NetworkXNoPath:
             raise ModelError(f"No path exists from '{source_id}' to '{target_id}'")
     
@@ -420,26 +440,32 @@ class RelationshipMap:
         """
         return [set(component) for component in nx.weakly_connected_components(self.graph)]
     
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, detail_level: DetailLevel = DetailLevel.STANDARD) -> Dict[str, Any]:
         """
-        Convert the relationship map to a JSON representation.
+        Convert the relationship map to a JSON representation with the specified detail level.
         
+        Args:
+            detail_level: The level of detail to include
+            
         Returns:
             JSON representation of the relationship map
         """
         nodes = []
         for node_id in self.graph.nodes:
             node = self.graph.nodes[node_id]["node"]
-            nodes.append(node.to_json())
+            filtered_node = self._apply_detail_level_to_node(node, detail_level)
+            nodes.append(filtered_node.to_json())
         
         relationships = []
         for source_id, target_id, data in self.graph.edges(data=True):
             relationship = data["relationship"]
-            relationships.append(relationship.to_json())
+            filtered_relationship = self._apply_detail_level_to_relationship(relationship, detail_level)
+            relationships.append(filtered_relationship.to_json())
         
         return {
             "nodes": nodes,
-            "relationships": relationships
+            "relationships": relationships,
+            "detail_level": detail_level.value
         }
     
     @classmethod
@@ -499,3 +525,98 @@ class RelationshipMap:
         
         logger.info(f"Loaded RelationshipMap from {path}")
         return relationship_map
+    
+    def _apply_detail_level_to_node(self, node: Node, detail_level: DetailLevel) -> Node:
+        """
+        Apply detail level filtering to a node.
+        
+        Args:
+            node: The node to filter
+            detail_level: The level of detail to include
+            
+        Returns:
+            Filtered node
+        """
+        # Create a copy of the node to avoid modifying the original
+        filtered_node = copy.deepcopy(node)
+        
+        if detail_level == DetailLevel.MINIMAL:
+            # Minimal detail level: keep only essential fields, strip metadata
+            filtered_node.metadata = {}
+            
+            # For FunctionNode, keep only name and type, remove details
+            if isinstance(filtered_node, FunctionNode):
+                filtered_node.parameters = []
+                filtered_node.return_type = None
+                
+            # For ClassNode, keep only name and type, remove details
+            elif isinstance(filtered_node, ClassNode):
+                filtered_node.properties = []
+                
+            # For MethodNode, keep only name and parent class, remove details
+            elif isinstance(filtered_node, MethodNode):
+                filtered_node.parameters = []
+                filtered_node.return_type = None
+                
+        elif detail_level == DetailLevel.STANDARD:
+            # Standard detail level: keep essential fields and basic metadata
+            
+            # Remove non-essential metadata
+            metadata_to_keep = ["visibility", "deprecation", "access_level", "source_file"]
+            filtered_metadata = {}
+            for key in metadata_to_keep:
+                if key in filtered_node.metadata:
+                    filtered_metadata[key] = filtered_node.metadata[key]
+            filtered_node.metadata = filtered_metadata
+            
+            # For FunctionNode, keep parameters but remove detailed type info
+            if isinstance(filtered_node, FunctionNode) and filtered_node.parameters:
+                for param in filtered_node.parameters:
+                    if "type" in param and param["type"] is not None:
+                        # Keep only name and is_optional from type info
+                        minimal_type = {"name": param["type"].get("name", "any")}
+                        if "is_optional" in param["type"]:
+                            minimal_type["is_optional"] = param["type"]["is_optional"]
+                        param["type"] = minimal_type
+                        
+            # Similar simplifications for ClassNode and MethodNode
+            # ...
+        
+        # For DetailLevel.DETAILED, return the full node as is
+        
+        return filtered_node
+    
+    def _apply_detail_level_to_relationship(self, relationship: Relationship, detail_level: DetailLevel) -> Relationship:
+        """
+        Apply detail level filtering to a relationship.
+        
+        Args:
+            relationship: The relationship to filter
+            detail_level: The level of detail to include
+            
+        Returns:
+            Filtered relationship
+        """
+        # Create a copy of the relationship to avoid modifying the original
+        filtered_relationship = copy.deepcopy(relationship)
+        
+        if detail_level == DetailLevel.MINIMAL:
+            # Minimal detail level: strip all metadata
+            filtered_relationship.metadata = {}
+            
+            # For CallsRelationship, remove line number
+            if isinstance(filtered_relationship, CallsRelationship):
+                filtered_relationship.line_number = None
+                
+        elif detail_level == DetailLevel.STANDARD:
+            # Standard detail level: keep essential metadata
+            metadata_to_keep = ["visibility", "call_type", "importance"]
+            filtered_metadata = {}
+            for key in metadata_to_keep:
+                if key in filtered_relationship.metadata:
+                    filtered_metadata[key] = filtered_relationship.metadata[key]
+            filtered_relationship.metadata = filtered_metadata
+        
+        # For DetailLevel.DETAILED, return the full relationship as is
+        
+        return filtered_relationship
