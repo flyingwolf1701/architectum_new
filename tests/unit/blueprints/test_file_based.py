@@ -152,14 +152,34 @@ class TestFileBasedBlueprint:
     
     def test_init_file_not_found(self, relationship_map, json_mirrors):
         """Test initialization with a file that doesn't exist in either representation."""
-        # This should produce a warning but not an error
+        with pytest.raises(BlueprintError):
+            FileBasedBlueprint(
+                relationship_map,
+                json_mirrors,
+                ["non_existent_file.py"]
+            )
+
+    def test_init_all_invalid_paths(self, relationship_map, json_mirrors):
+        """All invalid paths should raise an error."""
+        with pytest.raises(BlueprintError):
+            FileBasedBlueprint(
+                relationship_map,
+                json_mirrors,
+                ["bad1.py", "bad2.py"]
+            )
+
+    def test_init_some_invalid_paths(self, relationship_map, json_mirrors, test_file_paths):
+        """Invalid paths are removed when at least one valid path exists."""
+        valid_path = test_file_paths[0]
+        invalid_path = "does_not_exist.py"
+
         blueprint = FileBasedBlueprint(
             relationship_map,
             json_mirrors,
-            ["non_existent_file.py"]
+            [valid_path, invalid_path]
         )
-        
-        assert blueprint.file_paths == [os.path.abspath("non_existent_file.py")]
+
+        assert blueprint.file_paths == [os.path.abspath(valid_path)]
     
     def test_generate(self, blueprint):
         """Test generating a file-based blueprint."""
@@ -282,10 +302,8 @@ class TestFileBasedBlueprint:
         # Add a test relationship
         source_id = f"file:{blueprint.file_paths[0]}"
         target_id = f"file:{blueprint.file_paths[1]}"
-        rel_type = "imports"
-        
         # We need to inject a test relationship here
-        from arch_blueprint_generator.models.nodes import RelationshipType, ImportsRelationship
+        from arch_blueprint_generator.models.nodes import ImportsRelationship
         relationship = ImportsRelationship(source_id, target_id)
         blueprint.relationship_map.add_relationship(relationship)
         

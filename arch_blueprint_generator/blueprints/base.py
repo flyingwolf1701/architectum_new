@@ -207,12 +207,17 @@ class Blueprint(ABC):
                 
                 # Create blueprint of the right type
                 blueprint_type = data.get("type", cls.__name__)
+                extra_args = {}
+                if "file_paths" in data:
+                    extra_args["file_paths"] = data["file_paths"]
+
                 blueprint = BlueprintFactory.create_blueprint(
                     blueprint_type,
                     relationship_map,
                     json_mirrors,
                     data.get("name"),
-                    DetailLevel.from_string(data.get("detail_level", "standard"))
+                    DetailLevel.from_string(data.get("detail_level", "standard")),
+                    **extra_args,
                 )
                 
                 # Set content
