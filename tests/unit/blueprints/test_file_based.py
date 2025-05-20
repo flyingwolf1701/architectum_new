@@ -179,19 +179,6 @@ class TestFileBasedBlueprint:
             [valid_path, invalid_path]
         )
 
-            )
-
-    def test_init_some_invalid_paths(self, relationship_map, json_mirrors, test_file_paths):
-        """Invalid paths are removed when at least one valid path exists."""
-        valid_path = test_file_paths[0]
-        invalid_path = "does_not_exist.py"
-
-        blueprint = FileBasedBlueprint(
-            relationship_map,
-            json_mirrors,
-            [valid_path, invalid_path]
-        )
-
         assert blueprint.file_paths == [os.path.abspath(valid_path)]
     
     def test_generate(self, blueprint):
