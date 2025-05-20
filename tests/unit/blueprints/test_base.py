@@ -204,8 +204,9 @@ class TestBlueprintBase:
         
         # Load the blueprint
         loaded_blueprint = Blueprint.load(output_path, relationship_map, json_mirrors)
-        
+
         # Verify the loaded blueprint
         assert loaded_blueprint.name == test_blueprint.name
         assert loaded_blueprint.detail_level == test_blueprint.detail_level
         assert loaded_blueprint.content == test_blueprint.content
+        assert loaded_blueprint.file_paths == [os.path.abspath("test.py")]

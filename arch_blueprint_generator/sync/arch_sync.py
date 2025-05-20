@@ -160,17 +160,9 @@ class ArchSync:
                 file_count += len(rel_map.get_nodes_by_type(NodeType.FILE))
             elif os.path.isfile(path):
                 logger.info(f"Rescanning file: {path}")
-                # For individual files, we need to determine the parent directory
-                parent_dir = os.path.dirname(path)
-                file_name = os.path.basename(path)
-                
-                # Scan the parent directory but filter for only this file
-                scanner = PathScanner(
-                    parent_dir,
-                    relationship_map=self.relationship_map,
-                    json_mirrors=self.json_mirrors
-                )
-                scanner.scan()
+                # Remove any existing nodes for the file then add it back
+                self._clean_existing_file_nodes(path)
+                self._add_file(path)
                 file_count += 1
         
         # Since we're doing a force rescan, count all files as updates

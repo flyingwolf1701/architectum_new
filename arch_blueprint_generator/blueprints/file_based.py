@@ -58,7 +58,7 @@ class FileBasedBlueprint(Blueprint):
 
         # Validate file paths and remove or raise errors for invalid ones
         self._validate_file_paths()
-    
+        
     def generate(self) -> None:
         """
         Generate a file-based blueprint.
@@ -88,6 +88,12 @@ class FileBasedBlueprint(Blueprint):
         except Exception as e:
             logger.error(f"Error generating file-based blueprint: {str(e)}")
             raise BlueprintError(f"Failed to generate file-based blueprint: {str(e)}")
+
+    def to_json(self) -> Dict[str, Any]:
+        """Return JSON representation including file paths."""
+        data = super().to_json()
+        data["file_paths"] = self.file_paths
+        return data
     
     def _process_file(self, file_path: str) -> Optional[Dict[str, Any]]:
         """
