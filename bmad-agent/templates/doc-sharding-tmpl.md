@@ -12,7 +12,7 @@ This plan directs the agent on how to break down large source documents into sma
 
 - **Instruction:** For each Epic identified within the PRD:
 - **Source Section(s) to Copy:** The complete text for the Epic, including its main description, goals, and all associated user stories or detailed requirements under that Epic. Ensure to capture content starting from a heading like "**Epic X:**" up to the next such heading or end of the "Epic Overview" section.
-- **Target File Pattern:** `docs/epic-<id>.md`
+- **Target File Pattern:** `docs/epics/epic_<id>/epic-<id>.md`
   - _Agent Note: `<id>` should correspond to the Epic number._
 
 ---
@@ -24,42 +24,45 @@ This plan directs the agent on how to break down large source documents into sma
 ### 2.1. Core Architecture Granules
 
 - **Source Section(s) to Copy:** Section(s) detailing "API Reference", "API Endpoints", or "Service Interfaces".
-- **Target File:** `docs/api-reference.md`
+- **Target File:** `docs/supporting_documents/api-reference.md`
 
 - **Source Section(s) to Copy:** Section(s) detailing "Data Models", "Database Schema", "Entity Definitions".
-- **Target File:** `docs/data-models.md`
+- **Target File:** `docs/supporting_documents/data-models.md`
 
 - **Source Section(s) to Copy:** Section(s) titled "Environment Variables Documentation", "Configuration Settings", "Deployment Parameters", or relevant subsections within "Infrastructure and Deployment Overview" if a dedicated section is not found.
-- **Target File:** `docs/environment-vars.md`
+- **Target File:** `docs/supporting_documents/environment-vars.md`
 
   - _Agent Note: Prioritize a dedicated 'Environment Variables' section or linked 'environment-vars.md' source if available. If not, extract relevant configuration details from 'Infrastructure and Deployment Overview'. This shard is for specific variable definitions and usage._
 
 - **Source Section(s) to Copy:** Section(s) detailing "Project Structure".
-- **Target File:** `docs/project-structure.md`
+- **Target File:** `docs/supporting_documents/project-structure.md`
 
   - _Agent Note: If the project involves multiple repositories (not a monorepo), ensure this file clearly describes the structure of each relevant repository or links to sub-files if necessary._
 
 - **Source Section(s) to Copy:** Section(s) detailing "Technology Stack", "Key Technologies", "Libraries and Frameworks", or "Definitive Tech Stack Selections".
-- **Target File:** `docs/tech-stack.md`
+- **Target File:** `docs/supporting_documents/tech-stack.md`
 
 - **Source Section(s) to Copy:** Sections detailing "Coding Standards", "Development Guidelines", "Best Practices", "Testing Strategy", "Testing Decisions", "QA Processes", "Overall Testing Strategy", "Error Handling Strategy", and "Security Best Practices".
-- **Target File:** `docs/operational-guidelines.md`
+- **Target File:** `docs/supporting_documents/operational-guidelines.md`
 
   - _Agent Note: This file consolidates several key operational aspects. Ensure that the content from each source section ("Coding Standards", "Testing Strategy", "Error Handling Strategy", "Security Best Practices") is clearly delineated under its own H3 (###) or H4 (####) heading within this document._
 
 - **Source Section(s) to Copy:** Section(s) titled "Component View" (including sub-sections like "Architectural / Design Patterns Adopted").
-- **Target File:** `docs/component-view.md`
+- **Target File:** `docs/supporting_documents/component-view.md`
 
 - **Source Section(s) to Copy:** Section(s) titled "Core Workflow / Sequence Diagrams" (including all sub-diagrams).
-- **Target File:** `docs/sequence-diagrams.md`
+- **Target File:** `docs/supporting_documents/sequence-diagrams.md`
 
 - **Source Section(s) to Copy:** Section(s) titled "Infrastructure and Deployment Overview".
-- **Target File:** `docs/infra-deployment.md`
+- **Target File:** `docs/supporting_documents/infra-deployment.md`
 
-  - _Agent Note: This is for the broader overview, distinct from the specific `docs/environment-vars.md`._
+  - _Agent Note: This is for the broader overview, distinct from the specific `docs/supporting_documents/environment-vars.md`._
 
 - **Source Section(s) to Copy:** Section(s) titled "Key Reference Documents".
-- **Target File:** `docs/key-references.md`
+- **Target File:** `docs/supporting_documents/key-references.md`
+
+- **Source Section(s) to Copy:** Section(s) titled "Catalog System" or describing the catalog files (project_catalog.yaml and feature_catalog.yaml).
+- **Target File:** `docs/supporting_documents/catalog-system.md`
 
 ---
 
@@ -70,32 +73,46 @@ This plan directs the agent on how to break down large source documents into sma
 ### 3.1. Front-End Granules
 
 - **Source Section(s) to Copy:** Section(s) detailing "Front-End Project Structure" or "Detailed Frontend Directory Structure".
-- **Target File:** `docs/front-end-project-structure.md`
+- **Target File:** `docs/supporting_documents/front-end-project-structure.md`
 
 - **Source Section(s) to Copy:** Section(s) detailing "UI Style Guide", "Brand Guidelines", "Visual Design Specifications", or "Styling Approach".
-- **Target File:** `docs/front-end-style-guide.md`
+- **Target File:** `docs/supporting_documents/front-end-style-guide.md`
 
   - _Agent Note: This section might be a sub-section or refer to other documents (e.g., `ui-ux-spec.txt`). Extract the core styling philosophy and approach defined within the frontend architecture document itself._
 
 - **Source Section(s) to Copy:** Section(s) detailing "Component Library", "Reusable UI Components Guide", "Atomic Design Elements", or "Component Breakdown & Implementation Details".
-- **Target File:** `docs/front-end-component-guide.md`
+- **Target File:** `docs/supporting_documents/front-end-component-guide.md`
 
 - **Source Section(s) to Copy:** Section(s) detailing "Front-End Coding Standards" (specifically for UI development, e.g., JavaScript/TypeScript style, CSS naming conventions, accessibility best practices for FE).
-- **Target File:** `docs/front-end-coding-standards.md`
+- **Target File:** `docs/supporting_documents/front-end-coding-standards.md`
 
   - _Agent Note: A dedicated top-level section for this might not exist. If not found, this shard might be empty or require cross-referencing with the main architecture's coding standards. Extract any front-end-specific coding conventions mentioned._
 
 - **Source Section(s) to Copy:** Section(s) titled "State Management In-Depth".
-- **Target File:** `docs/front-end-state-management.md`
+- **Target File:** `docs/supporting_documents/front-end-state-management.md`
 
 - **Source Section(s) to Copy:** Section(s) titled "API Interaction Layer".
-- **Target File:** `docs/front-end-api-interaction.md`
+- **Target File:** `docs/supporting_documents/front-end-api-interaction.md`
 
 - **Source Section(s) to Copy:** Section(s) titled "Routing Strategy".
-- **Target File:** `docs/front-end-routing-strategy.md`
+- **Target File:** `docs/supporting_documents/front-end-routing-strategy.md`
 
 - **Source Section(s) to Copy:** Section(s) titled "Frontend Testing Strategy".
-- **Target File:** `docs/front-end-testing-strategy.md`
+- **Target File:** `docs/supporting_documents/front-end-testing-strategy.md`
+
+---
+
+## 4. Catalog Files and Structure
+
+- **Note to Agent:** These are generated with their own specific format and would not typically be sharded from existing documentation.
+
+### 4.1. Catalog Files
+
+- **Target File:** `docs/catalogs/project_catalog.md`
+  - _Agent Note: This should be a summary description of the project catalog, explain its purpose and provide a template of what it looks like. If no content exists, create the structure based on information in the architecture document about the project catalog._
+
+- **Target File:** `docs/catalogs/feature_catalog.md`
+  - _Agent Note: This should be a summary description of the feature catalog, explain its purpose and provide a template of what it looks like. If no content exists, create the structure based on information in the architecture document about the feature catalog._
 
 ---
 

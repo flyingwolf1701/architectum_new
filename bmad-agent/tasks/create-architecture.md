@@ -10,7 +10,7 @@
 
 1.  **Input Analysis & Dialogue Establishment:**
 
-    - Ensure you have all necessary inputs: PRD document (specifically checking for the 'Technical Assumptions' and 'Initial Architect Prompt' sections for the decided repository and service architecture), project brief, any deep research reports, and optionally a `technical-preferences.md`. Request any missing critical documents.
+    - Ensure you have all necessary inputs: PRD document (specifically checking for the 'Technical Assumptions' and 'Initial Architect Prompt' sections for the decided repository and service architecture - located at docs/core_documents/prd.md), project brief (located at docs/core_documents/project-brief.md), architecture overview (located at docs/core_documents/architecture.md), any deep research reports, and optionally a `technical-preferences.md`. Request any missing critical documents.
     - Thoroughly review all inputs.
     - Summarize key technical requirements, constraints, NFRs (Non-Functional Requirements), and the decided repository/service architecture derived from the inputs. Present this summary to the user for confirmation and to ensure mutual understanding.
     - Share initial architectural observations, potential challenges, or areas needing clarification based on the inputs.

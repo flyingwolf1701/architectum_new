@@ -1,10 +1,10 @@
 # Data Models
 
-This document details the core data models used in the Architectum system. These models form the foundation of the dual representation approach (Relationship Map and JSON Mirrors) used to provide efficient code comprehension.
+This document details the core data models used in the Architectum system. These models form the foundation of the three-component approach (System Map, JSON Mirrors, and Blueprints) used to provide efficient code comprehension.
 
-## Relationship Map Models
+## System Map Models
 
-The Relationship Map represents code as a directed graph of nodes and relationships, optimized for navigation and relationship analysis.
+The System Map represents code as a directed graph of nodes and relationships, optimized for navigation and relationship analysis.
 
 ### Node Types
 
@@ -139,7 +139,7 @@ Blueprints combine elements from both core representations to create specialized
 class Blueprint:
     """Base class for all blueprint types."""
     
-    relationship_map: RelationshipMap
+    system_map: SystemMap
     json_mirrors: JSONMirrors
     
     def to_json(self) -> Dict[str, Any]:
@@ -148,46 +148,111 @@ class Blueprint:
     def to_xml(self) -> str:
         """Convert blueprint to XML representation."""
 
-class FileBasedBlueprint(Blueprint):
-    """Blueprint focusing on entire files."""
+class PathBasedBlueprint(Blueprint):
+    """Blueprint focusing on directory structures."""
     
-    file_paths: List[str]
+    path: str
+    depth: int  # 0 for all levels
     
     def generate(self) -> None:
-        """Generate blueprint for the specified files."""
+        """Generate blueprint for the specified path with given depth."""
 
-class ComponentBasedBlueprint(Blueprint):
-    """Blueprint focusing on specific components within files."""
+class MethodBasedBlueprint(Blueprint):
+    """Blueprint focusing on specific methods within files."""
     
-    components: Dict[str, List[str]]  # Maps file paths to component names
+    components: Dict[str, List[str]]  # Maps file paths to method names (empty list means entire file)
     
     def generate(self) -> None:
-        """Generate blueprint for the specified components."""
+        """Generate blueprint for the specified methods."""
+```
 
-class FeatureBlueprint(Blueprint):
-    """Persistent blueprint documenting a complete feature."""
+## Catalog Models
+
+Architectum uses two YAML catalog files to track the codebase.
+
+### Project Catalog (Raw Inventory)
+
+The `project_catalog.yaml` file serves as a canonical inventory of everything in the codebase.
+
+```python
+class ProjectCatalog:
+    """Manages the project catalog."""
     
-    name: str
-    description: str
-    components: Dict[str, List[str]]  # Maps file paths to component names
-    yaml_path: str  # Path to the YAML definition
+    catalog_path: str
     
-    def generate(self) -> None:
-        """Generate blueprint for the feature."""
+    def load(self) -> List[Dict[str, Any]]:
+        """Load the project catalog from the YAML file."""
         
-    def save(self) -> None:
-        """Save the feature blueprint for future reference."""
-
-class TemporaryBlueprint(Blueprint):
-    """Ad-hoc blueprint for immediate development tasks."""
-    
-    components: Dict[str, List[str]]  # Maps file paths to component names
-    
-    def generate(self) -> None:
-        """Generate blueprint for temporary use."""
+    def save(self, catalog: List[Dict[str, Any]]) -> None:
+        """Save the project catalog to the YAML file."""
         
-    def clear(self) -> None:
-        """Clear the temporary blueprint after use."""
+    def update_file(self, file_path: str, functions: List[str], classes: List[Dict[str, Any]], tracking: Dict[str, bool]) -> None:
+        """Update a file entry in the project catalog."""
+        
+    def get_file(self, file_path: str) -> Optional[Dict[str, Any]]:
+        """Get a file entry from the project catalog."""
+        
+    def remove_file(self, file_path: str) -> None:
+        """Remove a file entry from the project catalog."""
+```
+
+Example Project Catalog entry:
+
+```yaml
+- path: "src/utils/time.js"
+  functions:
+    - "formatDate"
+    - "parseTimestamp"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+```
+
+### Feature Catalog (Task Context Mapping)
+
+The `feature_catalog.yaml` file organizes code by feature across multiple files.
+
+```python
+class FeatureCatalog:
+    """Manages the feature catalog."""
+    
+    catalog_path: str
+    
+    def load(self) -> List[Dict[str, Any]]:
+        """Load the feature catalog from the YAML file."""
+        
+    def save(self, catalog: List[Dict[str, Any]]) -> None:
+        """Save the feature catalog to the YAML file."""
+        
+    def add_feature(self, feature_name: str, files: List[Dict[str, Any]]) -> None:
+        """Add a new feature to the catalog."""
+        
+    def update_feature(self, feature_name: str, files: List[Dict[str, Any]]) -> None:
+        """Update a feature in the catalog."""
+        
+    def get_feature(self, feature_name: str) -> Optional[Dict[str, Any]]:
+        """Get a feature from the catalog."""
+        
+    def remove_feature(self, feature_name: str) -> None:
+        """Remove a feature from the catalog."""
+```
+
+Example Feature Catalog entry:
+
+```yaml
+- feature: "User Authentication"
+  files:
+    - path: "src/auth/login.js"
+      functions:
+        - "validateCredentials"
+        - "createSession"
+    - path: "src/models/user.js"
+      classes:
+        - "User"
+        - "AuthenticationService"
+          methods:
+            - "verify"
+            - "generateToken"
 ```
 
 ## Data Persistence Models
@@ -199,10 +264,9 @@ The SQLite database is used for local storage of blueprint metadata and cache re
 #### Blueprints Table
 - `id`: UUID primary key
 - `name`: String, blueprint name
-- `type`: String, blueprint type (file, component, feature, temporary)
+- `type`: String, blueprint type (path, method)
 - `creation_date`: Timestamp
 - `last_updated`: Timestamp
-- `yaml_definition`: Text, YAML definition for the blueprint
 
 #### Blueprint Files Table
 - `blueprint_id`: UUID, foreign key to blueprints table

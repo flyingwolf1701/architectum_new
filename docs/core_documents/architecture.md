@@ -6,11 +6,10 @@ Architectum is a code comprehension system designed to transform codebases into 
 
 ### 1.1 High-Level Architecture
 
-Architectum employs a multi-layered architecture with two core representations:
-1. A **Relationship Map** - A graph model capturing relationships between code elements
+Architectum employs a three-component architecture:
+1. A **System Map** - A graph-based representation optimized for navigation and relationship discovery
 2. **JSON Mirrors** - A parallel file structure that mirrors the original codebase with JSON representations of each file
-
-These core representations are then used to generate various types of **Blueprints** - specialized views assembled for specific purposes.
+3. **Blueprints** - Specialized views generated from the core representations for AI consumption
 
 ```mermaid
 graph TD
@@ -20,22 +19,18 @@ graph TD
     classDef blueprints fill:#b1ff,stroke:#333,stroke-width:1px
 
     A[Code Files] --> B[Parser Layer]
-    B --> C[Relationship Map]:::coreComponents
+    B --> C[System Map]:::coreComponents
     B --> M[JSON Mirrors]:::coreComponents
     C <--> M
     
     C --> BP[Blueprint Generator]:::coreComponents
     M --> BP
     
-    BP --> FB[File-Based Blueprint]:::blueprints
-    BP --> CB[Component-Based Blueprint]:::blueprints
-    BP --> FEB[Feature Blueprint]:::blueprints
-    BP --> TB[Temporary Blueprint]:::blueprints
+    BP --> PB[Path-Based Blueprint]:::blueprints
+    BP --> MB[Method-Based Blueprint]:::blueprints
     
-    FB --> E[Serialization Layer]
-    CB --> E
-    FEB --> E
-    TB --> E
+    PB --> E[Serialization Layer]
+    MB --> E
     E --> F[Output Formats]
     
     G[API/CLI Interface]:::interfaces --> B
@@ -51,7 +46,7 @@ graph TD
     K --> C
     K --> M
     
-    Y[YAML Blueprint Definitions]:::dataStores --> BP
+    Y[YAML Catalogs]:::dataStores --> BP
     
     L[VSCode Extension]:::interfaces --> K
     
@@ -61,31 +56,28 @@ graph TD
 The architecture consists of:
 
 1. **Parser Layer**: Extracts code structure and relationships from source files, optionally leveraging LSP
-2. **Relationship Map**: Represents code as a network of nodes and relationships
+2. **System Map**: Represents code as a network of nodes and relationships, enabling navigation from any point
 3. **JSON Mirrors**: Maintains a mirrored JSON representation of each file in the codebase
-4. **Blueprint Generator**: Creates different types of blueprints based on the core representations
+4. **Blueprint Generator**: Creates blueprints based on the core representations
 5. **Blueprint Types**:
-   - **File-Based Blueprint**: Combines selected files for comprehensive context
-   - **Component-Based Blueprint**: Focuses on specific functions/classes within files
-   - **Feature Blueprint**: Persistent documentation of a complete feature
-   - **Temporary Blueprint**: Ad-hoc creation for immediate development tasks
+   - **Path-Based Blueprint**: Analyzes directory structures with configurable depth
+   - **Method-Based Blueprint**: Focuses on specific methods (defaults to entire file if no methods specified)
 6. **Serialization Layer**: Converts blueprints to various output formats
 7. **API/CLI Interface**: Provides interaction points for users and other systems
 8. **Blueprint Cache**: Stores generated blueprints for incremental updates
 9. **LSP Integration**: Optional enhancement for more accurate relationship extraction
 10. **Visualization Engine**: Renders graph-based blueprints for human consumption
-11. **Arch Sync Command**: CLI tool and API for synchronizing code with its Architectum representation
+11. **Arch Sync Command**: CLI tool and API for synchronizing code with Architectum representation
 12. **VSCode Extension**: IDE integration for synchronizing files with Architectum
 13. **Change Tracker**: Tracks which files need synchronization
-14. **YAML Blueprint Definitions**: Configuration files defining blueprint contents
+14. **YAML Catalogs**: Two catalog files (`project_catalog.yaml` and `feature_catalog.yaml`) for tracking the codebase
 
 ### 1.2 Core Design Principles
 
 Architectum's architecture is guided by the following principles:
 
-- **Dual Core Representation**: Code is represented both as a relationship map (for navigation efficiency) and as JSON mirrors (for detailed content)
-- **Blueprint Assembly**: Blueprints are specialized views that combine elements from the core representations based on use cases
-- **Declarative Blueprint Definition**: YAML files provide a clear way to define what belongs in a blueprint
+- **Three-Component Core**: Code is represented through a System Map (for navigation), JSON Mirrors (for content), and Blueprints (for AI consumption)
+- **Catalog-Based Tracking**: Use `project_catalog.yaml` for raw file inventory and `feature_catalog.yaml` for feature organization
 - **Developer-Controlled Synchronization**: Developers explicitly control when to synchronize code with Architectum using the `arch sync` command
 - **Incremental Processing**: Changes should only regenerate affected portions of representations
 - **Format Flexibility**: Internal processing uses JSON but supports transformation to other formats
@@ -191,9 +183,9 @@ class CodeElement:
 }
 ```
 
-### 2.2 Relationship Map
+### 2.2 System Map
 
-The Relationship Map is the central component for navigation, representing code as a directed graph of nodes and relationships.
+The System Map is the central component for navigation, representing code as a directed graph of nodes and relationships.
 
 #### 2.2.1 Node Types
 
@@ -321,7 +313,7 @@ Architectum generates specialized blueprint types based on the core representati
 class Blueprint:
     """Base class for all blueprint types."""
     
-    relationship_map: RelationshipMap
+    system_map: SystemMap
     json_mirrors: JSONMirrors
     
     def to_json(self) -> Dict[str, Any]:
@@ -331,93 +323,86 @@ class Blueprint:
         """Convert blueprint to XML representation."""
 ```
 
-#### 2.4.2 File-Based Blueprint
+#### 2.4.2 Path-Based Blueprint
 
 ```python
-class FileBasedBlueprint(Blueprint):
-    """Blueprint focusing on entire files."""
+class PathBasedBlueprint(Blueprint):
+    """Blueprint focusing on directory structures."""
     
-    file_paths: List[str]
+    path: str
+    depth: int  # 0 for all levels
     
     def generate(self) -> None:
-        """Generate blueprint for the specified files."""
+        """Generate blueprint for the specified path with given depth."""
 ```
 
-#### 2.4.3 Component-Based Blueprint
+#### 2.4.3 Method-Based Blueprint
 
 ```python
-class ComponentBasedBlueprint(Blueprint):
-    """Blueprint focusing on specific components within files."""
+class MethodBasedBlueprint(Blueprint):
+    """Blueprint focusing on specific methods within files."""
     
-    components: Dict[str, List[str]]  # Maps file paths to component names
-    
-    def generate(self) -> None:
-        """Generate blueprint for the specified components."""
-```
-
-#### 2.4.4 Feature Blueprint
-
-```python
-class FeatureBlueprint(Blueprint):
-    """Persistent blueprint documenting a complete feature."""
-    
-    name: str
-    description: str
-    components: Dict[str, List[str]]  # Maps file paths to component names
-    yaml_path: str  # Path to the YAML definition
+    components: Dict[str, List[str]]  # Maps file paths to method names (empty list means entire file)
     
     def generate(self) -> None:
-        """Generate blueprint for the feature."""
-        
-    def save(self) -> None:
-        """Save the feature blueprint for future reference."""
+        """Generate blueprint for the specified methods."""
 ```
 
-#### 2.4.5 Temporary Blueprint
+### 2.5 Catalog Files
 
-```python
-class TemporaryBlueprint(Blueprint):
-    """Ad-hoc blueprint for immediate development tasks."""
-    
-    components: Dict[str, List[str]]  # Maps file paths to component names
-    
-    def generate(self) -> None:
-        """Generate blueprint for temporary use."""
-        
-    def clear(self) -> None:
-        """Clear the temporary blueprint after use."""
-```
+Architectum uses two YAML catalog files to track the codebase.
 
-#### 2.4.6 YAML Blueprint Definition
-
-Architectum uses YAML files to define blueprints:
+#### 2.5.1 Project Catalog
 
 ```yaml
-# Feature Blueprint: User Authentication
-type: feature  # or file, component, temporary
-name: user-authentication
-description: "All components related to user authentication flow"
-persistence: persistent  # or "temporary"
+# project_catalog.yaml
+- path: "src/utils/time.js"
+  functions:
+    - "formatDate"
+    - "parseTimestamp"
+  tracking:
+    json_representation: false
+    system_map_updated: false
 
-# Components to include
-components:
-  - file: src/auth/login.js
-    # Empty elements means include entire file
-    elements: []
-  
-  - file: src/auth/register.js
-    elements: []
-  
-  - file: src/models/user.js
-    elements:
-      - validateCredentials
-      - hashPassword
-      - comparePasswords
-  
-  - file: src/utils/security.js
-    elements:
-      - generateToken
-      - verifyToken
+- path: "src/models/user.js"
+  classes:
+    - "User"
+    - "UserSettings"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+```
+
+#### 2.5.2 Feature Catalog
+
+```yaml
+# feature_catalog.yaml
+- feature: "User Authentication"
+  files:
+    - path: "src/auth/login.js"
+      functions:
+        - "validateCredentials"
+        - "createSession"
+    - path: "src/models/user.js"
+      classes:
+        - "User"
+        - "AuthenticationService"
+          methods:
+            - "verify"
+            - "generateToken"
+
+- feature: "Permissions System"
+  files:
+    - path: "src/auth/permissions.js"
+      functions:
+        - "canAccess"
+        - "getUserPermissions"
+    - path: "src/models/user.js"
+      classes:
+        - "User"
+          methods:
+            - "hasRole"
+            - "getRoles"
 ```
 
 ### 3.1 Blueprint CLI Commands
@@ -431,69 +416,45 @@ def cli():
 def blueprint():
     """Generate blueprints from code."""
 
-@blueprint.command('file')
-@click.argument('files', nargs=-1, required=True)
+@blueprint.command('path')
+@click.argument('path', required=True)
+@click.option('--depth', default=0, help='Depth to scan (0 for all)')
 @click.option('--output', default='-', help='Output file (- for stdout)')
 @click.option('--format', default='json', help='Output format')
-def file_blueprint(files, output, format):
-    """Generate blueprint for specified files."""
+def path_blueprint(path, depth, output, format):
+    """Generate blueprint for a directory path."""
     
-@blueprint.command('component')
+@blueprint.command('method')
 @click.option('--file', '-f', multiple=True, required=True, help='Source file path')
-@click.option('--component', '-c', multiple=True, required=True, help='Component name within file')
+@click.option('--method', '-m', multiple=True, help='Method name within file (omit for entire file)')
 @click.option('--output', default='-', help='Output file (- for stdout)')
 @click.option('--format', default='json', help='Output format')
-def component_blueprint(file, component, output, format):
-    """Generate blueprint for specific components."""
-    
-@blueprint.command('feature')
-@click.option('--yaml', required=True, help='YAML blueprint definition file')
-@click.option('--output', default='-', help='Output file (- for stdout)')
-@click.option('--format', default='json', help='Output format')
-def feature_blueprint(yaml, output, format):
-    """Generate blueprint from YAML definition."""
-    
-@blueprint.command('temporary')
-@click.option('--yaml', required=True, help='YAML blueprint definition file')
-@click.option('--output', default='-', help='Output file (- for stdout)')
-@click.option('--format', default='json', help='Output format')
-def temporary_blueprint(yaml, output, format):
-    """Generate temporary blueprint from YAML definition."""
+def method_blueprint(file, method, output, format):
+    """Generate blueprint for specific methods or entire files."""
 ```
 
 ### 3.2 Blueprint API Interface
 
 ```python
-def create_file_blueprint(file_paths: List[str], output_format: str = 'json') -> Union[Dict[str, Any], str]:
+def create_path_blueprint(path: str, depth: int = 0, output_format: str = 'json') -> Union[Dict[str, Any], str]:
     """
-    Create a file-based blueprint.
+    Create a path-based blueprint.
     
     Args:
-        file_paths: List of file paths to include
+        path: Directory path to analyze
+        depth: Depth to scan (0 for all)
         output_format: Format to return (json, xml)
         
     Returns:
         Blueprint in the requested format
     """
 
-def create_component_blueprint(components: Dict[str, List[str]], output_format: str = 'json') -> Union[Dict[str, Any], str]:
+def create_method_blueprint(components: Dict[str, List[str]], output_format: str = 'json') -> Union[Dict[str, Any], str]:
     """
-    Create a component-based blueprint.
+    Create a method-based blueprint.
     
     Args:
-        components: Dictionary mapping file paths to component names
-        output_format: Format to return (json, xml)
-        
-    Returns:
-        Blueprint in the requested format
-    """
-    
-def create_blueprint_from_yaml(yaml_path: str, output_format: str = 'json') -> Union[Dict[str, Any], str]:
-    """
-    Create a blueprint from a YAML definition.
-    
-    Args:
-        yaml_path: Path to YAML definition file
+        components: Dictionary mapping file paths to method names (empty list for entire file)
         output_format: Format to return (json, xml)
         
     Returns:
@@ -512,13 +473,13 @@ graph TD
     B --> D[Sync with Architectum]
     D --> E[IDE Extension: Sync Current File]
     D --> F[CLI: arch sync]
-    E --> H[Architectum Updates Representations]
+    E --> H[Architectum Updates System Map & JSON Mirrors]
     F --> H
-    H --> I[Updated Relationship Map & JSON Mirrors]
+    H --> I[Updated project_catalog.yaml]
     
     J[Need Code Understanding] --> K[Create Blueprint]
     K --> L[CLI: arch blueprint]
-    K --> M[YAML Definition]
+    K --> M[Use feature_catalog.yaml]
     L --> N[Blueprint Generated]
     M --> N
     N --> O[AI Analysis with Blueprint Context]
@@ -532,42 +493,25 @@ graph TD
 graph TD
     A[Receive Task to Modify Code] --> B[Access Core Representations]
     B --> C[Create Blueprint for Context]
-    C --> D[YAML Definition or API Call]
+    C --> D[Path or Method Blueprint]
     D --> E[Blueprint Generated]
     E --> F[Analyze Code with Blueprint Context]
     F --> G[Write/Modify Code]
     G --> H[Save File]
     H --> I[Call architectum_sync_file API]
-    I --> J[Architectum Updates Representations]
+    I --> J[Architectum Updates System Map & JSON Mirrors]
     J --> K[Continue Development with Updated Context]
     K --> C
-```
-
-### 4.3 Feature Documentation Workflow
-
-```mermaid
-graph TD
-    A[Complete Feature Development] --> B[Define Feature Blueprint]
-    B --> C[Create YAML Definition]
-    C --> D[Generate Feature Blueprint]
-    D --> E[Save as Persistent Documentation]
-    E --> F[Add to Project Documentation]
-    
-    G[New Developer Joins Team] --> H[Reviews Feature Blueprints]
-    H --> I[Selects Feature to Understand]
-    I --> J[Views Feature Blueprint]
-    J --> K[Faster Understanding of Codebase]
-    K --> L[Begin Development with Context]
 ```
 
 ## 5. Technical Implementation
 
 ### 5.1 Technology Stack
 
-- **Primary Language**: Python 3.9+
-- **Graph Library**: NetworkX or custom implementation
+- **Primary Language**: Python 3.13
+- **Graph Library**: NetworkX
 - **CLI Framework**: Click
-- **API Framework** (optional): Flask/FastAPI
+- **API Framework**: FastAPI
 - **Serialization**: JSON (primary), XML (for AI consumption)
 - **VSCode Extension**: TypeScript
 - **Testing**: pytest, hypothesis, pact
@@ -581,9 +525,9 @@ architectum/
 │   ├── __init__.py
 │   ├── models/                   # Core data models
 │   │   ├── __init__.py
-│   │   ├── relationship_map.py   # Relationship map model
-│   │   ├── json_mirrors.py       # JSON mirrors model
-│   │   └── nodes.py              # Node and relationship types
+│   │   ├── system_map.py        # System map model
+│   │   ├── json_mirrors.py      # JSON mirrors model
+│   │   └── nodes.py             # Node and relationship types
 │   ├── parsers/                  # Code parsing
 │   │   ├── __init__.py
 │   │   ├── python_parser.py     # Python-specific parser
@@ -591,17 +535,16 @@ architectum/
 │   ├── blueprints/               # Blueprint types
 │   │   ├── __init__.py
 │   │   ├── base.py              # Blueprint base class
-│   │   ├── file_based.py        # File-based blueprint
-│   │   ├── component_based.py   # Component-based blueprint
-│   │   ├── feature.py           # Feature blueprint
-│   │   └── temporary.py         # Temporary blueprint
+│   │   ├── path_based.py        # Path-based blueprint
+│   │   └── method_based.py      # Method-based blueprint
 │   ├── navigation/               # Navigation components
 │   │   ├── __init__.py
 │   │   ├── file_navigator.py    # JSON mirror navigation
-│   │   └── graph_navigator.py   # Relationship map navigation
+│   │   └── graph_navigator.py   # System map navigation
 │   ├── yaml/                     # YAML processing
 │   │   ├── __init__.py
-│   │   └── blueprint_config.py  # YAML blueprint configuration
+│   │   ├── project_catalog.py   # Project catalog management
+│   │   └── feature_catalog.py   # Feature catalog management
 │   ├── formatters/               # Output formatting
 │   │   ├── __init__.py
 │   │   ├── json_formatter.py    # JSON output
@@ -616,7 +559,7 @@ architectum/
 │   ├── cli/                      # Command-line interface
 │   │   ├── __init__.py
 │   │   └── commands.py          # CLI commands
-│   └── api/                      # API interface (optional)
+│   └── api/                      # API interface
 │       ├── __init__.py
 │       └── routes.py            # API endpoints
 ├── vscode-extension/            # VSCode extension
@@ -691,7 +634,7 @@ class GraphMLFormatter(OutputFormatter):
 
 - Track component property flow across React/Vue components
 - Identify prop origins and prop usage
-- Visualize prop flow in the relationship map
+- Visualize prop flow in the System Map
 
 ### 7.4 Advanced Feature Tagging
 
@@ -712,3 +655,4 @@ class GraphMLFormatter(OutputFormatter):
 | Initial draft | 05-17-2025 | 0.1     | Initial architecture document  | System Architect |
 | Update        | 05-17-2025 | 0.2     | Added arch sync workflow       | System Architect |
 | Revision      | 05-17-2025 | 0.3     | Refined blueprint types and core representations | System Architect |
+| Update        | 05-21-2025 | 0.4     | Updated to simplified architecture with two blueprint types and catalog system | Claude 3.7 Sonnet |

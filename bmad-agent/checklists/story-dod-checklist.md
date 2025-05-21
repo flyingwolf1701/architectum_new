@@ -37,6 +37,7 @@ Before marking a story as 'Review', please go through each item in this checklis
     - [ ] All tasks within the story file are marked as complete.
     - [ ] Any clarifications or decisions made during development are documented in the story file or linked appropriately.
     - [ ] The story wrap up section has been completed with notes of changes or information relevant to the next story or overall project, the agent model that was primarily used during development, and the changelog of any changes is properly updated.
+    - [ ] A comprehensive QA Testing Guide has been included with clear steps to verify the implementation works as expected.
 6.  **Dependencies, Build & Configuration:**
 
     - [ ] Project builds successfully without errors.

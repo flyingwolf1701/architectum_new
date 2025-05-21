@@ -55,8 +55,20 @@ If the project includes a significant user interface, a separate Frontend Archit
 ├── build/                      # Compiled output (if applicable, often git-ignored)
 ├── config/                     # Static configuration files (if any)
 ├── docs/                       # Project documentation (PRD, Arch, etc.)
-│   ├── index.md
-│   └── ... (other .md files)
+│   ├── index.md                # Central navigation document
+│   ├── core_documents/         # Core project documentation
+│   │   ├── architecture.md     # This document
+│   │   ├── prd.md              # Product Requirements Document
+│   │   └── project-brief.md    # Project overview and goals
+│   ├── epics/                  # Epic-level documentation
+│   │   └── epic_1/             # Documentation for Epic 1
+│   ├── catalogs/               # YAML catalog files
+│   │   ├── feature_catalog.md  # Feature organization
+│   │   └── project_catalog.md  # Raw file inventory
+│   └── supporting_documents/   # Additional documentation
+│       ├── api-reference.md    # API specifications
+│       ├── data-models.md      # Data model specifications
+│       └── ...                 # Other supporting documents
 ├── infra/                      # Infrastructure as Code (e.g., CDK, Terraform)
 │   └── lib/
 │   └── bin/
@@ -364,7 +376,12 @@ Must be definitive selections; do not list open-ended choices (e.g., for web scr
 
 ## Key Reference Documents
 
-{ if any }
+{ List important reference documents with their paths, e.g.:
+- [Project Brief](../docs/core_documents/project-brief.md)  
+- [PRD](../docs/core_documents/prd.md)
+- [Catalog System](../docs/supporting_documents/catalog-system.md)
+- [Data Models](../docs/supporting_documents/data-models.md)
+}
 
 ## Change Log
 

@@ -69,6 +69,7 @@ MUST review and use:
 
     - Ensure all story tasks/subtasks are marked complete. Verify all tests pass.
     - <critical_rule>CRITICAL: Review `TODO-revert.md`. Meticulously revert all temporary changes for this story. Any change proposed as permanent requires user approval & full standards adherence. `TODO-revert.md` must be clean of unaddressed temporary changes for this story.</critical_rule>
+    - <critical_rule>CRITICAL: Create a comprehensive "QA Testing Guide" in the story file with clear steps for verifying the implementation works as expected. Include setup steps, commands to run, expected outputs, and how to verify each acceptance criterion.</critical_rule>
     - <critical_rule>CRITICAL: Meticulously verify story against each item in `docs/checklists/story-dod-checklist.txt`.</critical_rule>
     - Address any unmet checklist items.
     - Prepare itemized "Story DoD Checklist Report" in story file. Justify `[N/A]` items. Note DoD check clarifications/interpretations.
