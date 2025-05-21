@@ -406,7 +406,19 @@ class JSONMirrors:
         Returns:
             Path to the mirrored JSON file
         """
-        rel_path = os.path.relpath(os.path.abspath(source_path), self.root_path)
+        # Handle relative paths correctly - resolve relative to root_path, not cwd
+        if os.path.isabs(source_path):
+            abs_source_path = source_path
+        else:
+            abs_source_path = os.path.join(self.root_path, source_path)
+        
+        # On Windows, handle cross-drive paths safely
+        try:
+            rel_path = os.path.relpath(abs_source_path, self.root_path)
+        except ValueError:
+            # If we can't get a relative path (e.g., cross-drive on Windows),
+            # just use the basename since this is likely an invalid path anyway
+            rel_path = os.path.basename(abs_source_path)
         mirror_dir = os.path.join(self.mirror_path, os.path.dirname(rel_path))
         os.makedirs(mirror_dir, exist_ok=True)
         

@@ -60,3 +60,30 @@ def test_blueprint_file_invalid_detail_level(runner, tmp_path):
     )
     assert result.exit_code == 1
     assert "Invalid detail level" in result.output
+
+
+def test_blueprint_file_with_detailed_level(runner, tmp_path):
+    """Generate blueprint with detailed detail level."""
+    file1 = tmp_path / "one.py"
+    file2 = tmp_path / "two.py"
+    file1.write_text("def x():\n    pass")
+    file2.write_text("def y():\n    pass")
+    output_file = tmp_path / "out.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "blueprint",
+            "file",
+            str(file1),
+            str(file2),
+            "--output",
+            str(output_file),
+            "--detail-level",
+            "detailed",
+        ],
+    )
+    assert result.exit_code == 0
+    assert output_file.exists()
+    data = json.loads(output_file.read_text())
+    assert len(data["content"]["files"]) == 2
