@@ -58,5 +58,14 @@ This template should be used for all story files in the Architectum project. Fil
 - [Design decisions made]
 - [Follow-up needed]
 
+### QA Testing Guide
+[Detailed instructions for verifying the implementation works as expected. Include:
+- Setup steps needed before testing
+- Specific commands to run
+- Expected outputs or behaviors
+- Edge cases to test
+- How to verify each acceptance criterion
+- Any specific testing scenarios]
+
 ### Change Log
 - [Date]: [Description of change] by [Agent/Person]

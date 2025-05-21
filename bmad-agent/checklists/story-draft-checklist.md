@@ -39,6 +39,7 @@ The Scrum Master should use this checklist to validate that each story contains 
 - [ ] Key test scenarios are identified
 - [ ] Success criteria are defined
 - [ ] Special testing considerations are noted (if applicable)
+- [ ] QA testing approach is described, with verification steps that can be followed after implementation
 
 ## VALIDATION RESULT
 
