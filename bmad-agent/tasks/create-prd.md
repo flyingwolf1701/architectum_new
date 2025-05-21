@@ -33,7 +33,7 @@ Remember as you follow the upcoming instructions:
 
 ### 3\. Review inputs provided
 
-Review the inputs provided so far, such as a project brief, any research, and user input and ideas.
+Review the inputs provided so far, such as a project brief (located at docs/core_documents/project-brief.md), any research, and user input and ideas.
 
 ### 4\. Process PRD Sections
 

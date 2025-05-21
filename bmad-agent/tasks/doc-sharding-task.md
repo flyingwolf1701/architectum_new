@@ -33,7 +33,7 @@ Transform large project documents into smaller, granular files within the `docs/
 4.  For `docs/index.md`:
 
     - Create if absent
-    - Add descriptive titles and relative markdown links for each granular file
+    - Add descriptive titles and relative markdown links for each granular file following the established structure (core_documents, epics, supporting_documents, catalogs)
     - Organize content logically
     - Include brief descriptions where helpful
     - Ensure comprehensive cataloging
