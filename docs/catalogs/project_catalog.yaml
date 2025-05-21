@@ -1,0 +1,88 @@
+# project_catalog.yaml
+# A raw inventory of all files and their elements in the Architectum Blueprint Generator
+
+- path: "arch_blueprint_generator/models/relationship_map.py"
+  classes:
+    - "RelationshipMap"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/models/nodes.py"
+  classes:
+    - "TypeInfo"
+    - "ParameterInfo"
+    - "PropertyInfo"
+    - "Node"
+    - "FileNode"    
+    - "DirectoryNode"
+    - "FunctionNode"
+    - "ClassNode"
+    - "MethodNode"
+    - "FeatureNode"
+    - "Relationship"
+    - "ContainsRelationship"
+    - "CallsRelationship"
+    - "ImportsRelationship"
+    - "InheritsRelationship"
+    - "ImplementsRelationship"
+  enums:
+    - "NodeType"
+    - "RelationshipType"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/models/json_mirrors.py"
+  classes:
+    - "CodeElement"
+    - "FileContent"
+    - "DirectoryContent"
+    - "JSONMirrors"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+- path: "arch_blueprint_generator/scanner/path_scanner.py"
+  classes:
+    - "PathScanner"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/errors/exceptions.py"
+  classes:
+    - "ArchitectumError"
+    - "ParseError"
+    - "BlueprintError"
+    - "FileError"
+    - "ModelError"
+    - "BusinessError"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/utils/logging.py"
+  classes: []
+  functions:
+    - "add_colors"
+    - "configure_logging"
+    - "get_logger"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+- path: "arch_blueprint_generator/cli/commands.py"
+  classes: []
+  functions:
+    - "version_callback"
+    - "main"
+    - "blueprint"
+    - "scan"
+    - "sync"
+  tracking:
+    json_representation: false
+    system_map_updated: false
