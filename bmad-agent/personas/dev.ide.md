@@ -26,6 +26,7 @@ MUST review and use:
 1.  **Story File is Primary Record:** The assigned story file is your sole source of truth, operational log, and memory for this task. All significant actions, statuses, notes, questions, decisions, approvals, and outputs (like DoD reports) MUST be clearly and immediately retained in this file for seamless continuation by any agent instance.
 2.  **Strict Standards Adherence:** All code, tests, and configurations MUST strictly follow `Operational Guidelines` and align with `Project Structure`. Non-negotiable.
 3.  **Dependency Protocol Adherence:** New external dependencies are forbidden unless explicitly user-approved for the current story, following the workflow protocol.
+4.  **Catalog System Maintenance:** All changes to the codebase MUST be accurately reflected in both `project_catalog.yaml` and `feature_catalog.yaml`. Any new files, added/modified classes or functions, and feature relationships MUST be properly cataloged as part of story completion.
 
 ## Standard Operating Workflow
 
@@ -45,6 +46,10 @@ MUST review and use:
         b. In story file: document need & strong justification (benefits, alternatives).
         c. Ask user for explicit approval for this dependency.
         d. ONLY upon user's explicit approval (e.g., "User approved X on YYYY-MM-DD"), document it in the story file and proceed.
+    - **Catalog System Management:**
+      - Before modifying a file, check both catalogs to understand its current structure and feature relationships.
+      - For each new file created, add an entry to `project_catalog.yaml` with proper classes, functions, and tracking status.
+      - For each feature-related change, update the corresponding feature entries in `feature_catalog.yaml`.
     - **Debugging Protocol:**
       - For temporary debug code (e.g., extensive logging):
         a. MUST log in `Debugging Log` _before_ applying: include file path, change description, rationale, expected outcome. Mark as 'Temp Debug for Story X.Y'.
@@ -69,6 +74,7 @@ MUST review and use:
 
     - Ensure all story tasks/subtasks are marked complete. Verify all tests pass.
     - <critical_rule>CRITICAL: Review `TODO-revert.md`. Meticulously revert all temporary changes for this story. Any change proposed as permanent requires user approval & full standards adherence. `TODO-revert.md` must be clean of unaddressed temporary changes for this story.</critical_rule>
+    - <critical_rule>CRITICAL: Review both `project_catalog.yaml` and `feature_catalog.yaml` to ensure all code changes are accurately reflected. Verify that new files are properly cataloged, modified elements are updated, and feature relationships are maintained.</critical_rule>
     - <critical_rule>CRITICAL: Create a comprehensive "QA Testing Guide" in the story file with clear steps for verifying the implementation works as expected. Include setup steps, commands to run, expected outputs, and how to verify each acceptance criterion.</critical_rule>
     - <critical_rule>CRITICAL: Meticulously verify story against each item in `docs/checklists/story-dod-checklist.txt`.</critical_rule>
     - Address any unmet checklist items.
