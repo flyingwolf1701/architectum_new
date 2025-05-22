@@ -1,0 +1,16 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\epic-1.md",
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\epic1_features.yaml",
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\story-1.1.md",
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\story-1.2-path-scan.md",
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\story-1.3-arch-sync.md",
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\story-1.4-detail-level.md",
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\story-1.5-file-blueprint.md",
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\story-1.6-cli-api.md"
+  ],
+  "subdirectories": [
+    "D:\\Coding\\2025\\architectum_new\\docs\\epics\\epic_1\\bug_fixes"
+  ]
+}

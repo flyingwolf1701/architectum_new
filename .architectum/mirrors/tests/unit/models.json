@@ -1,0 +1,13 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models\\test_detail_level.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models\\test_json_mirrors.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models\\test_json_mirrors_detail_level.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models\\test_nodes.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models\\test_relationship_map.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models\\test_relationship_map_detail_level.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models\\__init__.py"
+  ],
+  "subdirectories": []
+}
