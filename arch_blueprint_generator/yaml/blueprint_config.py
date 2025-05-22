@@ -81,11 +81,13 @@ def _parse_yaml(text: str) -> Dict[str, Any]:
                     key, val = item_line.split(":", 1)
                     d: Dict[str, Any] = {key.strip(): _parse_value(val)}
                     parent.append(d)
+                    stack.append((indent + 2, d))
+                    last_key_stack.append(key.strip())
                     if val.strip() == "":
-                        stack.append((indent + 2, d))
-                        last_key_stack.append(key.strip())
+                        pass
                     else:
-                        last_key_stack.append(None)
+                        # keep dictionary on stack for additional keys
+                        pass
                 else:
                     parent.append(_parse_value(item_line))
                     last_key_stack.append(None)
@@ -99,12 +101,14 @@ def _parse_yaml(text: str) -> Dict[str, Any]:
             val = val.strip()
             if isinstance(parent, list):
                 raise YAMLValidationError("Cannot add key-value pair inside list without dash")
-            parent[key] = _parse_value(val)
-            last_key_stack[-1] = key
             if val == "":
+                parent[key] = []
+                last_key_stack[-1] = key
                 stack.append((indent + 2, parent[key]))
-                last_key_stack.append(None)
+                last_key_stack.append(key)
             else:
+                parent[key] = _parse_value(val)
+                last_key_stack[-1] = key
                 last_key_stack.append(None)
     return result
 
