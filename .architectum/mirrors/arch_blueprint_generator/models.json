@@ -1,0 +1,11 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\models",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\models\\detail_level.py",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\models\\json_mirrors.py",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\models\\nodes.py",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\models\\relationship_map.py",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\models\\__init__.py"
+  ],
+  "subdirectories": []
+}

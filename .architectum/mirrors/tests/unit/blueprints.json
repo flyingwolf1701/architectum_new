@@ -1,0 +1,10 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\tests\\unit\\blueprints",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\blueprints\\test_base.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\blueprints\\test_factory.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\blueprints\\test_file_based.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\blueprints\\__init__.py"
+  ],
+  "subdirectories": []
+}

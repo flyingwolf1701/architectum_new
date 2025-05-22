@@ -1,0 +1,13 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build\\agent-config.txt",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build\\agent-prompt.txt",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build\\checklists.txt",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build\\data.txt",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build\\personas.txt",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build\\tasks.txt",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build\\templates.txt"
+  ],
+  "subdirectories": []
+}

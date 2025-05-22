@@ -1,0 +1,13 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates\\architecture-tmpl.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates\\doc-sharding-tmpl.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates\\front-end-architecture-tmpl.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates\\front-end-spec-tmpl.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates\\prd-tmpl.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates\\project-brief-tmpl.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates\\story-tmpl.md"
+  ],
+  "subdirectories": []
+}
