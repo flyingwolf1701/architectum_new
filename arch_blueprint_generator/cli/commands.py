@@ -204,7 +204,13 @@ def blueprint_create(
         except (FileNotFoundError, YAMLValidationError) as e:
             error(str(e), exit_code=1)
 
-        files = [c.file for c in config.components]
+        files = []
+        yaml_dir = os.path.dirname(os.path.abspath(yaml))
+        for comp in config.components:
+            file_path = comp.file
+            if not os.path.isabs(file_path):
+                file_path = os.path.join(yaml_dir, file_path)
+            files.append(os.path.abspath(file_path))
         if not files:
             error("No files specified in YAML", exit_code=1)
 
