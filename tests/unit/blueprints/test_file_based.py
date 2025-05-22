@@ -8,7 +8,12 @@ import tempfile
 
 from arch_blueprint_generator.models.relationship_map import RelationshipMap
 from arch_blueprint_generator.models.json_mirrors import JSONMirrors, FileContent, CodeElement
-from arch_blueprint_generator.models.nodes import FileNode, FunctionNode, ContainsRelationship
+from arch_blueprint_generator.models.nodes import (
+    FileNode,
+    FunctionNode,
+    ContainsRelationship,
+    CallsRelationship,
+)
 from arch_blueprint_generator.models.detail_level import DetailLevel
 from arch_blueprint_generator.blueprints.file_based import FileBasedBlueprint
 from arch_blueprint_generator.errors.exceptions import BlueprintError
@@ -314,3 +319,35 @@ class TestFileBasedBlueprint:
         assert blueprint.content["relationships"][0]["type"] == "imports"
         assert blueprint.content["relationships"][0]["source_id"] == source_id
         assert blueprint.content["relationships"][0]["target_id"] == target_id
+
+    def test_cross_file_element_relationships(self, relationship_map, json_mirrors, test_file_paths):
+        """Cross-file element relationships are included."""
+        file1, file2 = test_file_paths
+
+        func2_id = f"func:{file2}:helper"
+        func2 = FunctionNode(
+            func2_id,
+            "helper",
+            parameters=[],
+            return_type=None,
+            line_start=1,
+            line_end=2,
+        )
+        relationship_map.add_node(func2)
+        relationship_map.add_relationship(ContainsRelationship(f"file:{file2}", func2_id))
+
+        call_rel = CallsRelationship(
+            f"func:{file1}:test_function",
+            func2_id,
+            1,
+        )
+        relationship_map.add_relationship(call_rel)
+
+        blueprint = FileBasedBlueprint(relationship_map, json_mirrors, test_file_paths)
+        blueprint.generate()
+
+        rels = blueprint.content["relationships"]
+        assert any(
+            r["type"] == "calls" and r["source_id"] == f"func:{file1}:test_function" and r["target_id"] == func2_id
+            for r in rels
+        )

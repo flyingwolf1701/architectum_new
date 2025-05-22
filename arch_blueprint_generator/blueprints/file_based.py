@@ -215,36 +215,53 @@ class FileBasedBlueprint(Blueprint):
             file_info["elements"] = elements
     
     def _add_relationships(self) -> None:
-        """
-        Add relationships between files in the blueprint.
-        
-        This includes file imports, function calls between files, etc.
-        """
-        # Create a set of node IDs for the files in this blueprint
+        """Add cross-file relationships for included files."""
         file_node_ids = {f"file:{path}" for path in self.file_paths}
-        
-        # Get all relationships where both source and target are in this blueprint
+
+        # Map element IDs to their containing file for quick lookup
+        element_to_file: Dict[str, str] = {}
+        for file_id in file_node_ids:
+            for rel in self.relationship_map.get_outgoing_relationships(file_id, self.detail_level):
+                if rel.type.value == "contains":
+                    element_to_file[rel.target_id] = file_id
+
         relationships = []
+
+        def serialize(rel) -> Dict[str, Any]:
+            info = {
+                "type": rel.type.value,
+                "source_id": rel.source_id,
+                "target_id": rel.target_id,
+            }
+            if hasattr(rel, "line_number") and getattr(rel, "line_number") is not None:
+                info["line_number"] = rel.line_number
+            if self.detail_level == DetailLevel.DETAILED and rel.metadata:
+                info["metadata"] = rel.metadata
+            return info
+
+        # File to file relationships
         for source_id in file_node_ids:
-            # Check outgoing relationships
-            outgoing_rels = self.relationship_map.get_outgoing_relationships(source_id, self.detail_level)
-            for rel in outgoing_rels:
-                # Skip "contains" relationships as they're already handled in file elements
+            for rel in self.relationship_map.get_outgoing_relationships(source_id, self.detail_level):
                 if rel.type.value == "contains":
                     continue
-                
-                # Only include relationships to other files in this blueprint
                 if rel.target_id in file_node_ids:
-                    relationships.append({
-                        "type": rel.type.value,
-                        "source_id": rel.source_id,
-                        "target_id": rel.target_id
-                    })
-                    
-                    # Add metadata for detailed level
-                    if self.detail_level == DetailLevel.DETAILED and rel.metadata:
-                        relationships[-1]["metadata"] = rel.metadata
-        
+                    relationships.append(serialize(rel))
+
+        # Element level relationships across files
+        for element_id, file_id in element_to_file.items():
+            for rel in self.relationship_map.get_outgoing_relationships(element_id, self.detail_level):
+                if rel.type.value == "contains":
+                    continue
+
+                target_file: Optional[str] = None
+                if rel.target_id in element_to_file:
+                    target_file = element_to_file[rel.target_id]
+                elif rel.target_id in file_node_ids:
+                    target_file = rel.target_id
+
+                if target_file and target_file in file_node_ids and target_file != file_id:
+                    relationships.append(serialize(rel))
+
         self.content["relationships"] = relationships
 
     def _validate_file_paths(self) -> None:
