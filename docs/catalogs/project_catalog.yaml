@@ -127,3 +127,29 @@
   tracking:
     json_representation: false
     system_map_updated: false
+
+- path: "arch_blueprint_generator/yaml/method_definition.py"
+  classes:
+    - "MethodBlueprintConfig"
+  functions:
+    - "load_method_blueprint_config"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/extractors/method_extractor.py"
+  classes:
+    - "MethodExtractor"
+  functions:
+    - "extract"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/blueprints/method_based.py"
+  classes:
+    - "MethodBasedBlueprint"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
