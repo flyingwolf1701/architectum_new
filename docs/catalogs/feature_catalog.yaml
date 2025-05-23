@@ -151,3 +151,28 @@
         - "_parse_value"
         - "_parse_yaml"
         - "load_blueprint_config"
+
+- feature: "Method-Based Blueprint Implementation"
+  files:
+    - path: "arch_blueprint_generator/blueprints/method_based.py"
+      classes:
+        - name: "MethodBasedBlueprint"
+          methods:
+            - "__init__"
+            - "generate"
+            - "_process_file"
+            - "_add_relationships"
+            - "_validate_file_paths"
+            - "_is_valid_file_path"
+      functions: []
+    - path: "arch_blueprint_generator/extractors/method_extractor.py"
+      classes:
+        - name: "MethodExtractor"
+          methods:
+            - "extract"
+      functions: []
+    - path: "arch_blueprint_generator/yaml/method_definition.py"
+      classes:
+        - name: "MethodBlueprintConfig"
+      functions:
+        - "load_method_blueprint_config"

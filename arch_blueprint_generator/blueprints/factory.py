@@ -13,6 +13,7 @@ from arch_blueprint_generator.utils.logging import get_logger
 
 # Import implementation classes
 from arch_blueprint_generator.blueprints.file_based import FileBasedBlueprint
+from arch_blueprint_generator.blueprints.method_based import MethodBasedBlueprint
 
 logger = get_logger(__name__)
 
@@ -28,6 +29,7 @@ class BlueprintFactory:
     # Registry of blueprint types
     _blueprint_types: Dict[str, Type[Blueprint]] = {
         "FileBasedBlueprint": FileBasedBlueprint,
+        "MethodBasedBlueprint": MethodBasedBlueprint,
         # More blueprint types will be added here as they are implemented
     }
     
@@ -137,4 +139,24 @@ class BlueprintFactory:
             name=name,
             detail_level=detail_level,
             file_paths=file_paths
+        )
+
+    @classmethod
+    def create_method_blueprint(
+        cls,
+        relationship_map: RelationshipMap,
+        json_mirrors: JSONMirrors,
+        components: Dict[str, List[str]],
+        name: Optional[str] = None,
+        detail_level: DetailLevel = DetailLevel.STANDARD,
+    ) -> MethodBasedBlueprint:
+        """Create a method-based blueprint."""
+
+        return cls.create_blueprint(
+            "MethodBasedBlueprint",
+            relationship_map,
+            json_mirrors,
+            name=name,
+            detail_level=detail_level,
+            components=components,
         )
