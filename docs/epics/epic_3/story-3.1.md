@@ -1,6 +1,6 @@
 # Story 3.1: Implement Method-Based Blueprint Logic
 
-## Status: Approved
+## Status: In-Progress - 2025-05-23
 
 ## Story
 
@@ -101,10 +101,10 @@ As an AI agent (via Architectum), I want to request a Method-Based Blueprint by 
 
 ## Story Progress Notes
 
-### Agent Model Used: `<To be filled by implementing agent>`
+### Agent Model Used: gpt-4
 
 ### Completion Notes List
 {To be filled during implementation}
 
 ### Change Log
-{To be updated during implementation}
+- 2025-05-23 - Started implementation - Dev Agent
