@@ -1,6 +1,6 @@
 # Story 3.3: Implement Detail Level Support for Method-Based Blueprints
 
-## Status: Draft
+## Status: Approved
 
 ## Story
 

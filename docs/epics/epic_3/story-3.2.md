@@ -1,6 +1,6 @@
 # Story 3.2: Implement Local Relationship Mapping for Methods
 
-## Status: Draft
+## Status: Approved
 
 ## Story
 

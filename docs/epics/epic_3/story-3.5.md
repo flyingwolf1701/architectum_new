@@ -1,6 +1,6 @@
 # Story 3.5: Expose Method-Based Blueprints via Enhanced API/CLI
 
-## Status: Draft
+## Status: Approved
 
 ## Story
 
