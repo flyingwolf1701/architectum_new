@@ -107,3 +107,47 @@
         - "blueprint"
         - "scan"
         - "sync"
+
+- feature: "File-Based Blueprint Implementation"
+  files:
+    - path: "arch_blueprint_generator/blueprints/base.py"
+      classes:
+        - name: "Blueprint"
+          methods:
+            - "__init__"
+            - "generate"
+            - "to_json"
+            - "to_xml"
+            - "save"
+            - "load"
+      functions: []
+    - path: "arch_blueprint_generator/blueprints/file_based.py"
+      classes:
+        - name: "FileBasedBlueprint"
+          methods:
+            - "__init__"
+            - "generate"
+            - "to_json"
+            - "_process_file"
+            - "_add_file_elements"
+            - "_add_relationships"
+            - "_validate_file_paths"
+            - "_is_valid_file_path"
+      functions: []
+    - path: "arch_blueprint_generator/blueprints/factory.py"
+      classes:
+        - name: "BlueprintFactory"
+          methods:
+            - "register_blueprint_type"
+            - "create_blueprint"
+            - "create_file_blueprint"
+      functions: []
+    - path: "arch_blueprint_generator/yaml/blueprint_config.py"
+      classes:
+        - name: "Component"
+        - name: "BlueprintConfig"
+        - name: "YAMLValidationError"
+      functions:
+        - "_parse_value"
+        - "_parse_yaml"
+        - "load_blueprint_config"
