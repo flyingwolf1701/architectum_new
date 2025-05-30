@@ -89,12 +89,8 @@ class GitIgnoreParser:
         Returns:
             Normalized pattern
         """
-        # Remove leading slash for absolute patterns
-        if pattern.startswith('/'):
-            pattern = pattern[1:]
-        
-        # Convert gitignore patterns to fnmatch patterns
-        # GitIgnore uses different semantics than fnmatch in some cases
+        # For absolute patterns (starting with /), keep track of this
+        # We'll handle them differently in matching
         return pattern
     
     def should_ignore(self, file_path: str, is_directory: bool = False) -> bool:
@@ -151,24 +147,19 @@ class GitIgnoreParser:
         Returns:
             True if the pattern matches
         """
-        # Handle different pattern types
+        # Handle absolute patterns (starting with /)
+        if pattern.startswith('/'):
+            # Absolute patterns match only from the root
+            pattern_without_slash = pattern[1:]
+            return fnmatch.fnmatch(file_path, pattern_without_slash)
         
         # If pattern contains '/', it's a path pattern
         if '/' in pattern:
             return fnmatch.fnmatch(file_path, pattern)
         
-        # Otherwise, match against basename or any part of the path
+        # For basename patterns, only match the basename
         basename = os.path.basename(file_path)
-        if fnmatch.fnmatch(basename, pattern):
-            return True
-        
-        # Also check if any part of the path matches
-        path_parts = file_path.split('/')
-        for part in path_parts:
-            if fnmatch.fnmatch(part, pattern):
-                return True
-        
-        return False
+        return fnmatch.fnmatch(basename, pattern)
     
     def _is_negated(self, file_path: str) -> bool:
         """
@@ -346,10 +337,6 @@ class EnhancedPathScanner:
             max_depth: Maximum depth to scan (0 for no limit)
             detail_config: Detail level configuration
         """
-        if max_depth > 0 and current_depth >= max_depth:
-            logger.debug(f"Reached max depth at {directory}")
-            return
-        
         # List all items in the directory with enhanced filtering
         try:
             items = self._list_directory_content(directory)
@@ -392,8 +379,11 @@ class EnhancedPathScanner:
                 contains_rel = ContainsRelationship(parent_node_id, subdir_node_id)
                 self.relationship_map.add_relationship(contains_rel)
                 
-                # Recursively scan subdirectory
-                self._scan_directory(item_path, subdir_node_id, current_depth + 1, max_depth, detail_config)
+                # Recursively scan subdirectory if within depth limit
+                if max_depth == 0 or current_depth < max_depth:
+                    self._scan_directory(item_path, subdir_node_id, current_depth + 1, max_depth, detail_config)
+                else:
+                    logger.debug(f"Reached max depth at {item_path}")
             
             elif os.path.isfile(item_path):
                 # Create node for file
