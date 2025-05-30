@@ -16,6 +16,7 @@ from arch_blueprint_generator.utils.logging import configure_logging, get_logger
 from arch_blueprint_generator.scanner.path_scanner import PathScanner
 from arch_blueprint_generator.models.detail_level import DetailLevel
 from arch_blueprint_generator.errors.exceptions import BlueprintError
+from arch_blueprint_generator.yaml import load_blueprint_config, YAMLValidationError
 
 app = typer.Typer(help="Architectum Blueprint Generator")
 blueprint_app = typer.Typer(help="Generate blueprints from code.")
@@ -181,6 +182,68 @@ def blueprint_file(
 
     except Exception as e:
         error(f"Error generating blueprint: {str(e)}", exit_code=1)
+
+
+@blueprint_app.command("create")
+def blueprint_create(
+    yaml: str = typer.Option(
+        ..., "--yaml", "-f", help="YAML blueprint definition file"
+    ),
+    output: str = typer.Option(
+        "-", "--output", "-o", help="Output file (- for stdout)"
+    ),
+    format: OutputFormat = typer.Option(
+        OutputFormat.JSON, "--format", "-m", help="Output format"
+    ),
+    pretty: bool = typer.Option(True, "--pretty/--compact", help="Pretty print output"),
+) -> None:
+    """Create a blueprint from a YAML definition."""
+    try:
+        try:
+            config = load_blueprint_config(yaml)
+        except (FileNotFoundError, YAMLValidationError) as e:
+            error(str(e), exit_code=1)
+
+        files = []
+        yaml_dir = os.path.dirname(os.path.abspath(yaml))
+        for comp in config.components:
+            file_path = comp.file
+            if not os.path.isabs(file_path):
+                file_path = os.path.join(yaml_dir, file_path)
+            files.append(os.path.abspath(file_path))
+        if not files:
+            error("No files specified in YAML", exit_code=1)
+
+        root_dir = os.path.commonpath(files)
+        scanner = PathScanner(root_dir)
+        relationship_map, json_mirrors = scanner.scan()
+
+        from arch_blueprint_generator.blueprints.factory import BlueprintFactory
+
+        dl = DetailLevel.from_string(config.detail_level)
+        blueprint = BlueprintFactory.create_file_blueprint(
+            relationship_map,
+            json_mirrors,
+            files,
+            name=config.name,
+            detail_level=dl,
+        )
+        blueprint.generate()
+
+        if format == OutputFormat.JSON:
+            content = json.dumps(blueprint.to_json(), indent=2 if pretty else None)
+        else:
+            content = blueprint.to_xml()
+
+        if output == "-":
+            typer.echo(content)
+        else:
+            with open(output, "w", encoding="utf-8") as f:
+                f.write(content)
+            success(f"Blueprint written to {output}")
+
+    except Exception as e:
+        error(f"Error creating blueprint: {str(e)}", exit_code=1)
 
 
 @app.command()

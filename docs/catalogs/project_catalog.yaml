@@ -45,6 +45,7 @@
   tracking:
     json_representation: false
     system_map_updated: false
+
 - path: "arch_blueprint_generator/scanner/path_scanner.py"
   classes:
     - "PathScanner"
@@ -75,6 +76,7 @@
   tracking:
     json_representation: false
     system_map_updated: false
+
 - path: "arch_blueprint_generator/cli/commands.py"
   classes: []
   functions:
@@ -83,6 +85,71 @@
     - "blueprint"
     - "scan"
     - "sync"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+# Epic 2: File-Based Blueprint Implementation Files
+
+- path: "arch_blueprint_generator/blueprints/base.py"
+  classes:
+    - "Blueprint"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/blueprints/file_based.py"
+  classes:
+    - "FileBasedBlueprint"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/blueprints/factory.py"
+  classes:
+    - "BlueprintFactory"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/yaml/blueprint_config.py"
+  classes:
+    - "Component"
+    - "BlueprintConfig"
+    - "YAMLValidationError"
+  functions:
+    - "_parse_value"
+    - "_parse_yaml"
+    - "load_blueprint_config"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/yaml/method_definition.py"
+  classes:
+    - "MethodBlueprintConfig"
+  functions:
+    - "load_method_blueprint_config"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/extractors/method_extractor.py"
+  classes:
+    - "MethodExtractor"
+  functions:
+    - "extract"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/blueprints/method_based.py"
+  classes:
+    - "MethodBasedBlueprint"
+  functions: []
   tracking:
     json_representation: false
     system_map_updated: false

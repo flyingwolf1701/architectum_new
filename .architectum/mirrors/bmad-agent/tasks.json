@@ -1,0 +1,18 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\checklist-mappings.yml",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\checklist-run-task.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\correct-course.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\create-ai-frontend-prompt.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\create-architecture.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\create-deep-research-prompt.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\create-frontend-architecture.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\create-next-story-task.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\create-prd.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\create-uxui-spec.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\doc-sharding-task.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks\\library-indexing-task.md"
+  ],
+  "subdirectories": []
+}

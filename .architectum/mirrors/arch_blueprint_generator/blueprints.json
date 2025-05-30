@@ -1,0 +1,10 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\blueprints",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\blueprints\\base.py",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\blueprints\\factory.py",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\blueprints\\file_based.py",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator\\blueprints\\__init__.py"
+  ],
+  "subdirectories": []
+}

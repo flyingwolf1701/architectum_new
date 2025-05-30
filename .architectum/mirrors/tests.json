@@ -1,0 +1,13 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\tests",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\tests\\conftest.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\__init__.py"
+  ],
+  "subdirectories": [
+    "D:\\Coding\\2025\\architectum_new\\tests\\contracts",
+    "D:\\Coding\\2025\\architectum_new\\tests\\integration",
+    "D:\\Coding\\2025\\architectum_new\\tests\\snapshots",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit"
+  ]
+}
