@@ -8,8 +8,8 @@ To identify the next logical story based on project progress and epic definition
 
 - Access to the project's documentation repository, specifically:
   - `docs/index.md` (hereafter "Index Doc")
-  - All Epic files (e.g., `docs/epic-{n}.md` - hereafter "Epic Files")
-  - Existing story files in `docs/stories/`
+  - All Epic files (e.g., `docs/epics/epic_{n}/epic-{n}.md` - hereafter "Epic Files")
+  - Existing story files in `docs/epics/epic_{n}/story-{n}.{n}.md`
   - Main PRD (hereafter "PRD Doc")
   - Main Architecture Document (hereafter "Main Arch Doc")
   - Frontend Architecture Document (hereafter "Frontend Arch Doc," if relevant)
@@ -27,15 +27,15 @@ To identify the next logical story based on project progress and epic definition
 
 ### 1. Identify Next Story for Preparation
 
-- Review `docs/stories/` to find the highest-numbered story file.
-- **If a highest story file exists (`{lastEpicNum}.{lastStoryNum}.story.md`):**
+- Review `docs/epics/epic_{n}/` directories to find the highest-numbered story file.
+- **If a highest story file exists (`docs/epics/epic_{lastEpicNum}/story-{lastEpicNum}.{lastStoryNum}.md`):**
 
   - Verify its `Status` is 'Done' (or equivalent).
   - If not 'Done', present an alert to the user:
 
     ```
     ALERT: Found incomplete story:
-    File: {lastEpicNum}.{lastStoryNum}.story.md
+    File: docs/epics/epic_{lastEpicNum}/story-{lastEpicNum}.{lastStoryNum}.md
     Status: [current status]
 
     Would you like to:
@@ -47,11 +47,11 @@ To identify the next logical story based on project progress and epic definition
     ```
 
   - Proceed only if user selects option 3 (Override) or if the last story was 'Done'.
-  - If proceeding: Check the Epic File for `{lastEpicNum}` for a story numbered `{lastStoryNum + 1}`. If it exists and its prerequisites (per Epic File) are met, this is the next story.
-  - Else (story not found or prerequisites not met): The next story is the first story in the next Epic File (e.g., `docs/epic-{lastEpicNum + 1}.md`, then `{lastEpicNum + 2}.md`, etc.) whose prerequisites are met.
+  - If proceeding: Check the Epic File for `docs/epics/epic_{lastEpicNum}/epic-{lastEpicNum}.md` for a story numbered `{lastStoryNum + 1}`. If it exists and its prerequisites (per Epic File) are met, this is the next story.
+  - Else (story not found or prerequisites not met): The next story is the first story in the next Epic File (e.g., `docs/epics/epic_{lastEpicNum + 1}/epic-{lastEpicNum + 1}.md`, then `epic_{lastEpicNum + 2}.md`, etc.) whose prerequisites are met.
 
-- **If no story files exist in `docs/stories/`:**
-  - The next story is the first story in `docs/epic-1.md` (then `docs/epic-2.md`, etc.) whose prerequisites are met.
+- **If no story files exist in `docs/epics/`:**
+  - The next story is the first story in `docs/epics/epic_1/epic-1.md` (then `docs/epics/epic_2/epic-2.md`, etc.) whose prerequisites are met.
 - If no suitable story with met prerequisites is found, report to the user that story creation is blocked, specifying what prerequisites are pending. HALT task.
 - Announce the identified story to the user: "Identified next story for preparation: {epicNum}.{storyNum} - {Story Title}".
 
@@ -82,7 +82,7 @@ To identify the next logical story based on project progress and epic definition
 
 ### 5. Populate Story Template with Full Context
 
-- Create a new story file: `docs/stories/{epicNum}.{storyNum}.story.md`.
+- Create a new story file: `docs/epics/epic_{epicNum}/story-{epicNum}.{storyNum}.md`.
 - Use the Story Template to structure the file.
 - Fill in:
   - Story `{EpicNum}.{StoryNum}: {Short Title Copied from Epic File}`

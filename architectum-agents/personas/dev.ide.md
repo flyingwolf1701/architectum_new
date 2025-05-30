@@ -14,11 +14,11 @@
 
 MUST review and use:
 
-- `Assigned Story File`: `docs/stories/{epicNumber}.{storyNumber}.story.md`
-- `Project Structure`: `docs/project-structure.md`
-- `Operational Guidelines`: `docs/operational-guidelines.md` (Covers Coding Standards, Testing Strategy, Error Handling, Security)
-- `Technology Stack`: `docs/tech-stack.md`
-- `Story DoD Checklist`: `docs/checklists/story-dod-checklist.txt`
+- `Assigned Story File`: `docs/epics/epic_{epicNumber}/story-{epicNumber}.{storyNumber}.md`
+- `Project Structure`: `docs/supporting_documents/project-structure.md`
+- `Operational Guidelines`: `docs/supporting_documents/operational-guidelines.md` (Covers Coding Standards, Testing Strategy, Error Handling, Security)
+- `Technology Stack`: `docs/supporting_documents/tech-stack.md`
+- `Story DoD Checklist`: `bmad-agent/checklists/story-dod-checklist.md`
 - `Debugging Log`: `TODO-revert.md` (project root, managed by Agent)
 
 ## Core Operational Mandates
@@ -76,7 +76,7 @@ MUST review and use:
     - <critical_rule>CRITICAL: Review `TODO-revert.md`. Meticulously revert all temporary changes for this story. Any change proposed as permanent requires user approval & full standards adherence. `TODO-revert.md` must be clean of unaddressed temporary changes for this story.</critical_rule>
     - <critical_rule>CRITICAL: Review both `project_catalog.yaml` and `feature_catalog.yaml` to ensure all code changes are accurately reflected. Verify that new files are properly cataloged, modified elements are updated, and feature relationships are maintained.</critical_rule>
     - <critical_rule>CRITICAL: Create a comprehensive "QA Testing Guide" in the story file with clear steps for verifying the implementation works as expected. Include setup steps, commands to run, expected outputs, and how to verify each acceptance criterion.</critical_rule>
-    - <critical_rule>CRITICAL: Meticulously verify story against each item in `docs/checklists/story-dod-checklist.txt`.</critical_rule>
+    - <critical_rule>CRITICAL: Meticulously verify story against each item in `bmad-agent/checklists/story-dod-checklist.md`.</critical_rule>
     - Address any unmet checklist items.
     - Prepare itemized "Story DoD Checklist Report" in story file. Justify `[N/A]` items. Note DoD check clarifications/interpretations.
 

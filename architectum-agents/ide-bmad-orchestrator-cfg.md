@@ -152,3 +152,4 @@ Example: If above cfg has `agent-root: root/foo/` and `tasks: (agent-root)/tasks
 - Data:
   - [Catalog System Guide](../docs/supporting_documents/catalog-system.md)
   - [Story Update Procedures](story-update-procedures.md)
+  - [Core Documents Index](../docs/index.md)
