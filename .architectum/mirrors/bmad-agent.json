@@ -1,0 +1,17 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\bmad-agent",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\ide-bmad-orchestrator-cfg.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\ide-bmad-orchestrator.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\web-bmad-orchestrator-agent-cfg.md",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\web-bmad-orchestrator-agent.md"
+  ],
+  "subdirectories": [
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\build",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\checklists",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\data",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\personas",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\tasks",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent\\templates"
+  ]
+}

@@ -1,0 +1,178 @@
+# feature_catalog.yaml
+# A feature-oriented view that maps code elements to features in the Architectum Blueprint Generator
+
+- feature: "Core Blueprint Generation Framework"
+  files:
+    - path: "arch_blueprint_generator/models/relationship_map.py"
+      classes:
+        - name: "RelationshipMap"
+          methods:
+            - "add_node"
+            - "add_relationship"
+            - "get_node"
+            - "get_nodes_by_type"
+            - "get_relationship"
+            - "get_outgoing_relationships"
+            - "get_incoming_relationships"
+            - "get_relationships_by_type"
+            - "remove_node"
+            - "remove_relationship"
+            - "clear"
+            - "node_count"
+            - "relationship_count"
+            - "get_node_type_counts"
+            - "get_relationship_type_counts"
+            - "get_subgraph"
+            - "find_nodes"
+            - "find_relationships"
+            - "shortest_path"
+            - "get_connected_components"
+            - "to_json"
+            - "from_json"
+            - "save"
+            - "load"
+      functions: []
+    - path: "arch_blueprint_generator/models/nodes.py"
+      enums:
+        - "NodeType"
+        - "RelationshipType"
+      classes:
+        - "TypeInfo"
+        - "ParameterInfo"
+        - "PropertyInfo"
+        - "Node"
+        - "FileNode"
+        - "DirectoryNode"
+        - "FunctionNode"
+        - "ClassNode"
+        - "MethodNode"
+        - "FeatureNode"
+        - "Relationship"
+        - "ContainsRelationship"
+        - "CallsRelationship"
+        - "ImportsRelationship"
+        - "InheritsRelationship"
+        - "ImplementsRelationship"
+      functions: []
+    - path: "arch_blueprint_generator/models/json_mirrors.py"
+      classes:
+        - name: "CodeElement"
+        - name: "FileContent"
+        - name: "DirectoryContent"
+        - name: "JSONMirrors"
+          methods:
+            - "get_mirror_path"
+            - "get_mirrored_content"
+            - "update_mirrored_content"
+            - "exists"
+            - "remove"
+            - "compute_file_hash"
+            - "is_mirror_up_to_date"
+            - "create_file_mirror"
+            - "create_directory_mirror"
+            - "list_all_mirrors"
+            - "scan_directory"
+            - "clear"
+      functions: []
+    - path: "arch_blueprint_generator/scanner/path_scanner.py"
+      classes:
+        - name: "PathScanner"
+          methods:
+            - "scan"
+            - "_scan_directory"
+            - "_list_directory_content"
+            - "_clean_existing_nodes"
+            - "is_binary_file"
+      functions: []
+
+    - path: "arch_blueprint_generator/errors/exceptions.py"
+      classes:
+        - "ArchitectumError"
+        - "ParseError"
+        - "BlueprintError"
+        - "FileError"
+        - "ModelError"
+        - "BusinessError"
+      functions: []
+    - path: "arch_blueprint_generator/utils/logging.py"
+      functions:
+        - "add_colors"
+        - "configure_logging"
+        - "get_logger"
+
+    - path: "arch_blueprint_generator/cli/commands.py"
+      functions:
+        - "version_callback"
+        - "main"
+        - "blueprint"
+        - "scan"
+        - "sync"
+
+- feature: "File-Based Blueprint Implementation"
+  files:
+    - path: "arch_blueprint_generator/blueprints/base.py"
+      classes:
+        - name: "Blueprint"
+          methods:
+            - "__init__"
+            - "generate"
+            - "to_json"
+            - "to_xml"
+            - "save"
+            - "load"
+      functions: []
+    - path: "arch_blueprint_generator/blueprints/file_based.py"
+      classes:
+        - name: "FileBasedBlueprint"
+          methods:
+            - "__init__"
+            - "generate"
+            - "to_json"
+            - "_process_file"
+            - "_add_file_elements"
+            - "_add_relationships"
+            - "_validate_file_paths"
+            - "_is_valid_file_path"
+      functions: []
+    - path: "arch_blueprint_generator/blueprints/factory.py"
+      classes:
+        - name: "BlueprintFactory"
+          methods:
+            - "register_blueprint_type"
+            - "create_blueprint"
+            - "create_file_blueprint"
+      functions: []
+    - path: "arch_blueprint_generator/yaml/blueprint_config.py"
+      classes:
+        - name: "Component"
+        - name: "BlueprintConfig"
+        - name: "YAMLValidationError"
+      functions:
+        - "_parse_value"
+        - "_parse_yaml"
+        - "load_blueprint_config"
+
+- feature: "Method-Based Blueprint Implementation"
+  files:
+    - path: "arch_blueprint_generator/blueprints/method_based.py"
+      classes:
+        - name: "MethodBasedBlueprint"
+          methods:
+            - "__init__"
+            - "generate"
+            - "_process_file"
+            - "_add_relationships"
+            - "_validate_file_paths"
+            - "_is_valid_file_path"
+      functions: []
+    - path: "arch_blueprint_generator/extractors/method_extractor.py"
+      classes:
+        - name: "MethodExtractor"
+          methods:
+            - "extract"
+      functions: []
+    - path: "arch_blueprint_generator/yaml/method_definition.py"
+      classes:
+        - name: "MethodBlueprintConfig"
+      functions:
+        - "load_method_blueprint_config"

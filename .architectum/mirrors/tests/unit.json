@@ -1,0 +1,15 @@
+{
+  "path": "D:\\Coding\\2025\\architectum_new\\tests\\unit",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\test_imports.py",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\__init__.py"
+  ],
+  "subdirectories": [
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\blueprints",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\cli",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\models",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\scanner",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\sync",
+    "D:\\Coding\\2025\\architectum_new\\tests\\unit\\yaml"
+  ]
+}

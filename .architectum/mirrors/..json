@@ -1,5 +1,26 @@
 {
-  "path": "C:\\Users\\trini\\Desktop\\software_engineer\\2025\\architectum_new",
-  "file_count": 9,
-  "subdirectory_count": 7
+  "path": "D:\\Coding\\2025\\architectum_new",
+  "files": [
+    "D:\\Coding\\2025\\architectum_new\\.python-version",
+    "D:\\Coding\\2025\\architectum_new\\AGENT.md",
+    "D:\\Coding\\2025\\architectum_new\\arch.bat",
+    "D:\\Coding\\2025\\architectum_new\\build-agent-cfg.js",
+    "D:\\Coding\\2025\\architectum_new\\build-bmad-web-orchestrator.js",
+    "D:\\Coding\\2025\\architectum_new\\main.py",
+    "D:\\Coding\\2025\\architectum_new\\pyproject.toml",
+    "D:\\Coding\\2025\\architectum_new\\README.md",
+    "D:\\Coding\\2025\\architectum_new\\requirements.txt",
+    "D:\\Coding\\2025\\architectum_new\\scan_test.py",
+    "D:\\Coding\\2025\\architectum_new\\setup.py",
+    "D:\\Coding\\2025\\architectum_new\\uv.lock"
+  ],
+  "subdirectories": [
+    "D:\\Coding\\2025\\architectum_new\\.architectum",
+    "D:\\Coding\\2025\\architectum_new\\.vscode",
+    "D:\\Coding\\2025\\architectum_new\\architectum-agents",
+    "D:\\Coding\\2025\\architectum_new\\arch_blueprint_generator",
+    "D:\\Coding\\2025\\architectum_new\\bmad-agent",
+    "D:\\Coding\\2025\\architectum_new\\docs",
+    "D:\\Coding\\2025\\architectum_new\\tests"
+  ]
 }

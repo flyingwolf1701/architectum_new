@@ -47,10 +47,14 @@ Before marking a story as 'Review', please go through each item in this checklis
     - [ ] No known security vulnerabilities introduced by newly added and approved dependencies.
     - [ ] If new environment variables or configurations were introduced by the story, they are documented and handled securely.
 
-7.  **Documentation (If Applicable):**
+7.  **Documentation & Catalog Maintenance:**
     - [ ] Relevant inline code documentation (e.g., JSDoc, TSDoc, Python docstrings) for new public APIs or complex logic is complete.
     - [ ] User-facing documentation updated, if changes impact users.
     - [ ] Technical documentation (e.g., READMEs, system diagrams) updated if significant architectural changes were made.
+    - [ ] All new files have been added to `project_catalog.yaml` with correct class/function listings and tracking status.
+    - [ ] All modified files have updated listings in `project_catalog.yaml` if classes or functions were added/removed.
+    - [ ] Feature relationships in `feature_catalog.yaml` have been updated for all implemented components.
+    - [ ] Tracking status in `project_catalog.yaml` has been updated for all modified files.
 
 ## Final Confirmation:
 

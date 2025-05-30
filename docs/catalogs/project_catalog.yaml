@@ -1,0 +1,190 @@
+# project_catalog.yaml
+# A raw inventory of all files and their elements in the Architectum Blueprint Generator
+
+- path: "arch_blueprint_generator/models/relationship_map.py"
+  classes:
+    - "RelationshipMap"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/models/nodes.py"
+  classes:
+    - "TypeInfo"
+    - "ParameterInfo"
+    - "PropertyInfo"
+    - "Node"
+    - "FileNode"    
+    - "DirectoryNode"
+    - "FunctionNode"
+    - "ClassNode"
+    - "MethodNode"
+    - "FeatureNode"
+    - "Relationship"
+    - "ContainsRelationship"
+    - "CallsRelationship"
+    - "ImportsRelationship"
+    - "InheritsRelationship"
+    - "ImplementsRelationship"
+  enums:
+    - "NodeType"
+    - "RelationshipType"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/models/json_mirrors.py"
+  classes:
+    - "CodeElement"
+    - "FileContent"
+    - "DirectoryContent"
+    - "JSONMirrors"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/scanner/path_scanner.py"
+  classes:
+    - "PathScanner"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/scanner/enhanced_path_scanner.py"
+  classes:
+    - "GitIgnoreParser"
+    - "EnhancedPathScanner"
+  functions:
+    - "find_git_root"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+    - "PathScanner"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/errors/exceptions.py"
+  classes:
+    - "ArchitectumError"
+    - "ParseError"
+    - "BlueprintError"
+    - "FileError"
+    - "ModelError"
+    - "BusinessError"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/utils/logging.py"
+  classes: []
+  functions:
+    - "add_colors"
+    - "configure_logging"
+    - "get_logger"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/cli/commands.py"
+  classes: []
+  functions:
+    - "version_callback"
+    - "main"
+    - "blueprint"
+    - "scan"
+    - "sync"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+# Epic 2: File-Based Blueprint Implementation Files
+
+- path: "arch_blueprint_generator/blueprints/base.py"
+  classes:
+    - "Blueprint"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/blueprints/file_based.py"
+  classes:
+    - "FileBasedBlueprint"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/blueprints/factory.py"
+  classes:
+    - "BlueprintFactory"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/yaml/blueprint_config.py"
+  classes:
+    - "Component"
+    - "BlueprintConfig"
+    - "YAMLValidationError"
+  functions:
+    - "_parse_value"
+    - "_parse_yaml"
+    - "load_blueprint_config"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/yaml/method_definition.py"
+  classes:
+    - "MethodBlueprintConfig"
+  functions:
+    - "load_method_blueprint_config"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/extractors/method_extractor.py"
+  classes:
+    - "MethodExtractor"
+  functions:
+    - "extract"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "arch_blueprint_generator/blueprints/method_based.py"
+  classes:
+    - "MethodBasedBlueprint"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "tests/unit/cli/test_scan_command.py"
+  classes: []
+  functions:
+    - "test_scan_help"
+    - "test_scan_basic_functionality"
+    - "test_scan_with_gitignore_disabled"
+    - "test_scan_with_additional_ignores"
+    - "test_scan_with_legacy_exclude_patterns"
+    - "test_scan_with_output_directory"
+    - "test_scan_with_different_detail_levels"
+    - "test_scan_with_depth_limit"
+    - "test_scan_nonexistent_path"
+    - "test_scan_invalid_detail_level"
+    - "test_scan_shows_pattern_counts"
+    - "test_scan_without_gitignore_file"
+    - "test_scan_combined_options"
+  tracking:
+    json_representation: false
+    system_map_updated: false

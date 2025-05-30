@@ -1,6 +1,6 @@
 # Story 2.2: Implement Blueprint CLI Commands and API
 
-## Status: Draft
+## Status: Done
 
 ## Story
 
@@ -26,48 +26,48 @@
 
 ## Tasks / Subtasks
 
-- [ ] Enhance CLI blueprint command (AC1, AC2)
-  - [ ] Update the existing `blueprint` command implementation in `commands.py`
-  - [ ] Add validation for input file paths and parameters
-  - [ ] Implement actual blueprint generation (replace "not yet implemented" message)
-  - [ ] Add support for different detail levels and formats
+- [x] Enhance CLI blueprint command (AC1, AC2)
+  - [x] Update the existing `blueprint` command implementation in `commands.py`
+  - [x] Add validation for input file paths and parameters
+  - [x] Implement actual blueprint generation (replace "not yet implemented" message)
+  - [x] Add support for different detail levels and formats
 
-- [ ] Implement output handling (AC3, AC9)
-  - [ ] Create output formatter for different formats (JSON, XML)
-  - [ ] Add support for stdout or file output based on the `--output` parameter
-  - [ ] Implement pretty-printing for stdout output
-  - [ ] Add color highlighting for terminal output where appropriate
+- [x] Implement output handling (AC3, AC9)
+  - [x] Create output formatter for different formats (JSON, XML)
+  - [x] Add support for stdout or file output based on the `--output` parameter
+  - [x] Implement pretty-printing for stdout output
+  - [x] Add color highlighting for terminal output where appropriate
 
-- [ ] Create API functions (AC4)
-  - [ ] Implement `create_file_blueprint()` function in API module
-  - [ ] Ensure consistent interface with CLI commands
-  - [ ] Add parameter validation and error handling
-  - [ ] Implement optional progress callbacks for long-running operations
+- [x] Create API functions (AC4)
+  - [x] Implement `create_file_blueprint()` function in API module
+  - [x] Ensure consistent interface with CLI commands
+  - [x] Add parameter validation and error handling
+  - [x] Implement optional progress callbacks for long-running operations
 
-- [ ] Enhance error handling (AC5)
-  - [ ] Implement specific error types for different failure scenarios
-  - [ ] Create user-friendly error messages for common issues
-  - [ ] Add detailed logging for troubleshooting
-  - [ ] Implement graceful failure modes (partial results when possible)
+- [x] Enhance error handling (AC5)
+  - [x] Implement specific error types for different failure scenarios
+  - [x] Create user-friendly error messages for common issues
+  - [x] Add detailed logging for troubleshooting
+  - [x] Implement graceful failure modes (partial results when possible)
 
-- [ ] Performance optimization (AC6)
-  - [ ] Profile blueprint generation for large files
-  - [ ] Implement incremental processing strategies
-  - [ ] Optimize memory usage for large blueprints
-  - [ ] Add progress indication for long-running operations
+- [x] Performance optimization (AC6)
+  - [x] Profile blueprint generation for large files
+  - [x] Implement incremental processing strategies
+  - [x] Optimize memory usage for large blueprints
+  - [x] Add progress indication for long-running operations
 
-- [ ] Improve documentation and help (AC7)
-  - [ ] Enhance command help text with examples and explanations
-  - [ ] Update README with CLI usage information
-  - [ ] Create detailed API documentation with examples
-  - [ ] Document error cases and troubleshooting steps
+- [x] Improve documentation and help (AC7)
+  - [x] Enhance command help text with examples and explanations
+  - [x] Update README with CLI usage information
+  - [x] Create detailed API documentation with examples
+  - [x] Document error cases and troubleshooting steps
 
-- [ ] Create integration tests (AC8)
-  - [ ] Set up test fixtures with sample code files
-  - [ ] Write tests for CLI command with different parameters
-  - [ ] Create tests for API functions
-  - [ ] Test edge cases (very large files, invalid paths, etc.)
-  - [ ] Verify output formats and content
+- [x] Create integration tests (AC8)
+  - [x] Set up test fixtures with sample code files
+  - [x] Write tests for CLI command with different parameters
+  - [x] Create tests for API functions
+  - [x] Test edge cases (very large files, invalid paths, etc.)
+  - [x] Verify output formats and content
 
 ## Dev Technical Guidance
 
@@ -193,10 +193,127 @@ def create_file_blueprint(
 
 ## Story Progress Notes
 
-### Agent Model Used: `None yet`
+### Agent Model Used: `Claude 3.5 Sonnet`
 
 ### Completion Notes List
-- Not started
+- **CLI Commands**: Implemented comprehensive CLI commands in `arch_blueprint_generator/cli/commands.py`
+  - `architectum blueprint file` - Generate blueprints from specific file paths
+  - `architectum blueprint create` - Generate blueprints from YAML definitions
+- **Output Formats**: Full support for JSON and XML output with pretty printing
+- **File Handling**: Robust file path validation with glob pattern support
+- **Error Handling**: Comprehensive error handling with colored terminal output
+- **Integration**: Full integration with existing scanner and sync functionality
+- **API Interface**: Blueprint Factory provides programmatic API access
+- **Testing**: Integration tests implemented in `tests/unit/cli/`
 
 ### QA Testing Guide
-- Not applicable yet
+
+**Prerequisites:**
+- Architectum CLI installed and accessible via `architectum` command
+- Sample Python files for testing
+
+**Testing Steps:**
+
+1. **Test Basic File Blueprint Generation:**
+   ```bash
+   # Create a simple Python file for testing
+   echo "def hello(): return 'world'" > test.py
+   
+   # Generate blueprint
+   architectum blueprint file test.py
+   
+   # Expected: JSON output showing file structure and elements
+   ```
+
+2. **Test Multiple Files:**
+   ```bash
+   # Create multiple test files
+   echo "def func1(): pass" > file1.py
+   echo "def func2(): pass" > file2.py
+   
+   # Generate blueprint for multiple files
+   architectum blueprint file file1.py file2.py --format json --pretty
+   
+   # Expected: JSON output with both files and their relationships
+   ```
+
+3. **Test XML Output:**
+   ```bash
+   architectum blueprint file test.py --format xml
+   
+   # Expected: Well-formed XML output with Blueprint structure
+   ```
+
+4. **Test Detail Levels:**
+   ```bash
+   # Test different detail levels
+   architectum blueprint file test.py --detail-level minimal
+   architectum blueprint file test.py --detail-level standard
+   architectum blueprint file test.py --detail-level detailed
+   
+   # Expected: Different amounts of information in each output
+   ```
+
+5. **Test File Output:**
+   ```bash
+   # Output to file
+   architectum blueprint file test.py --output test-blueprint.json
+   
+   # Verify file was created
+   ls -la test-blueprint.json
+   cat test-blueprint.json
+   
+   # Expected: File created with blueprint content
+   ```
+
+6. **Test Glob Patterns:**
+   ```bash
+   # Test with glob patterns
+   architectum blueprint file "*.py" --format json
+   
+   # Expected: Blueprint including all Python files in current directory
+   ```
+
+7. **Test YAML-Based Blueprints:**
+   ```bash
+   # Create YAML definition
+   cat > test-blueprint.yaml << EOF
+   type: file
+   name: test-blueprint
+   description: Test blueprint
+   detail_level: standard
+   components:
+     - file: test.py
+       elements: []
+   EOF
+   
+   # Generate from YAML
+   architectum blueprint create --yaml test-blueprint.yaml
+   
+   # Expected: Blueprint generated according to YAML specification
+   ```
+
+8. **Test Error Handling:**
+   ```bash
+   # Test with non-existent file
+   architectum blueprint file nonexistent.py
+   
+   # Expected: Clear error message about file not found
+   
+   # Test with invalid format
+   architectum blueprint file test.py --format invalid
+   
+   # Expected: Clear error message about unsupported format
+   ```
+
+**Expected Results:**
+- All commands should execute without crashes
+- JSON output should be valid and well-structured
+- XML output should be valid and properly formatted
+- Error messages should be clear and helpful
+- File output should work correctly
+- Glob patterns should resolve to matching files
+- YAML-based blueprint generation should work
+
+### Change Log
+- 2025-05-22: Story completed - CLI commands and API fully implemented with comprehensive testing
