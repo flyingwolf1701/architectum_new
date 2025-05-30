@@ -54,6 +54,21 @@
     json_representation: false
     system_map_updated: false
 
+- path: "arch_blueprint_generator/scanner/enhanced_path_scanner.py"
+  classes:
+    - "GitIgnoreParser"
+    - "EnhancedPathScanner"
+  functions:
+    - "find_git_root"
+  tracking:
+    json_representation: false
+    system_map_updated: false
+    - "PathScanner"
+  functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
 - path: "arch_blueprint_generator/errors/exceptions.py"
   classes:
     - "ArchitectumError"
@@ -150,6 +165,26 @@
   classes:
     - "MethodBasedBlueprint"
   functions: []
+  tracking:
+    json_representation: false
+    system_map_updated: false
+
+- path: "tests/unit/cli/test_scan_command.py"
+  classes: []
+  functions:
+    - "test_scan_help"
+    - "test_scan_basic_functionality"
+    - "test_scan_with_gitignore_disabled"
+    - "test_scan_with_additional_ignores"
+    - "test_scan_with_legacy_exclude_patterns"
+    - "test_scan_with_output_directory"
+    - "test_scan_with_different_detail_levels"
+    - "test_scan_with_depth_limit"
+    - "test_scan_nonexistent_path"
+    - "test_scan_invalid_detail_level"
+    - "test_scan_shows_pattern_counts"
+    - "test_scan_without_gitignore_file"
+    - "test_scan_combined_options"
   tracking:
     json_representation: false
     system_map_updated: false

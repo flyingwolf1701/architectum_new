@@ -1,0 +1,308 @@
+      - name: "test_blueprint_create_from_yaml"
+        description: "Tests blueprint creation from YAML definition file"
+        story: "story-2.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::blueprint_create"
+
+  - test_file: "tests/unit/cli/test_scan_command.py"
+    test_functions:
+      - name: "test_scan_help"
+        description: "Verifies help text display for scan command"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_basic_functionality"
+        description: "Tests basic directory scanning functionality via CLI"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_with_gitignore_disabled"
+        description: "Tests scanning with .gitignore functionality disabled"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_with_additional_ignores"
+        description: "Tests scanning with additional ignore patterns specified"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_with_legacy_exclude_patterns"
+        description: "Tests scanning with legacy exclude patterns for backwards compatibility"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_with_output_directory"
+        description: "Tests saving scan results to specified output directory"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_with_different_detail_levels"
+        description: "Tests scanning with minimal, standard, and detailed levels"
+        story: "story-1.4"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_with_depth_limit"
+        description: "Tests scanning with various depth limit settings"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_nonexistent_path"
+        description: "Ensures proper error handling for nonexistent scan paths"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_invalid_detail_level"
+        description: "Ensures proper error handling for invalid detail level input"
+        story: "story-1.4"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_shows_pattern_counts"
+        description: "Verifies scan output includes pattern matching statistics"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_without_gitignore_file"
+        description: "Tests scanning behavior when no .gitignore file exists"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+      - name: "test_scan_combined_options"
+        description: "Tests scanning with multiple options combined"
+        story: "story-1.2"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::scan"
+
+  - test_file: "tests/unit/cli/test_sync_command.py"
+    test_functions:
+      - name: "test_sync_help"
+        description: "Verifies help text display for sync command"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::sync"
+      - name: "test_sync_basic_functionality"
+        description: "Tests basic synchronization functionality via CLI"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::sync"
+      - name: "test_sync_recursive"
+        description: "Tests recursive synchronization of subdirectories"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::sync"
+      - name: "test_sync_force"
+        description: "Tests force synchronization regardless of file changes"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::sync"
+      - name: "test_sync_with_detail_levels"
+        description: "Tests synchronization with different detail level settings"
+        story: "story-1.4"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::sync"
+      - name: "test_sync_invalid_path"
+        description: "Ensures proper error handling for invalid sync paths"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/cli/commands.py::sync"
+
+  # Unit Tests - YAML Module
+  - test_file: "tests/unit/yaml/test_blueprint_config.py"
+    test_functions:
+      - name: "test_load_blueprint_config"
+        description: "Tests loading and parsing of blueprint YAML configuration files"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/yaml/blueprint_config.py::load_blueprint_config"
+      - name: "test_invalid_yaml"
+        description: "Ensures YAMLValidationError raised for malformed YAML files"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/yaml/blueprint_config.py::load_blueprint_config"
+      - name: "test_yaml_parsing"
+        description: "Tests internal YAML parsing functionality"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/yaml/blueprint_config.py::_parse_yaml"
+      - name: "test_value_parsing"
+        description: "Tests parsing of various YAML value types"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/yaml/blueprint_config.py::_parse_value"
+
+  # Unit Tests - Extractors Module
+  - test_file: "tests/unit/extractors/test_method_extractor.py"
+    test_functions:
+      - name: "test_extract_methods"
+        description: "Tests extraction of specific methods from files"
+        story: "story-3.1"
+        coverage_targets:
+          - "arch_blueprint_generator/extractors/method_extractor.py::MethodExtractor.extract"
+      - name: "test_extract_missing_methods"
+        description: "Tests handling of missing/unfound methods during extraction"
+        story: "story-3.1"
+        coverage_targets:
+          - "arch_blueprint_generator/extractors/method_extractor.py::MethodExtractor.extract"
+      - name: "test_extract_with_detail_levels"
+        description: "Tests method extraction with different detail levels"
+        story: "story-3.3"
+        coverage_targets:
+          - "arch_blueprint_generator/extractors/method_extractor.py::MethodExtractor.extract"
+
+  # Unit Tests - Core Imports
+  - test_file: "tests/unit/test_imports.py"
+    test_functions:
+      - name: "test_detail_level_imports"
+        description: "Tests that detail level imports work correctly and basic functionality"
+        story: "story-1.4"
+        coverage_targets:
+          - "arch_blueprint_generator/models/detail_level.py::DetailLevel"
+          - "arch_blueprint_generator/models/detail_level.py::DetailLevelConfig"
+
+  # Integration Tests
+  - test_file: "tests/integration/blueprints/test_file_based_integration.py"
+    test_functions:
+      - name: "test_file_based_blueprint_generation"
+        description: "End-to-end test of file-based blueprint generation with real files"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/blueprints/file_based.py::FileBasedBlueprint.generate"
+          - "arch_blueprint_generator/scanner/path_scanner.py::PathScanner.scan"
+          - "arch_blueprint_generator/blueprints/factory.py::BlueprintFactory.create_file_blueprint"
+      - name: "test_file_based_blueprint_detail_levels"
+        description: "Integration test for detail level control in file-based blueprints"
+        story: "story-1.4"
+        coverage_targets:
+          - "arch_blueprint_generator/blueprints/file_based.py::FileBasedBlueprint.generate"
+          - "arch_blueprint_generator/models/detail_level.py::DetailLevel"
+      - name: "test_file_based_blueprint_output_formats"
+        description: "Integration test for different output formats (JSON/XML) of blueprints"
+        story: "story-2.3"
+        coverage_targets:
+          - "arch_blueprint_generator/blueprints/base.py::Blueprint.save"
+          - "arch_blueprint_generator/blueprints/base.py::Blueprint.to_json"
+          - "arch_blueprint_generator/blueprints/base.py::Blueprint.to_xml"
+
+  - test_file: "tests/integration/scanner/test_path_scanner_detail_level.py"
+    test_functions:
+      - name: "test_scanner_detail_level_integration"
+        description: "End-to-end test of path scanner with different detail levels"
+        story: "story-1.4"
+        coverage_targets:
+          - "arch_blueprint_generator/scanner/path_scanner.py::PathScanner.scan"
+          - "arch_blueprint_generator/models/detail_level.py::DetailLevelConfig"
+      - name: "test_representation_detail_consistency"
+        description: "Tests that both representations respect detail level settings consistently"
+        story: "story-1.4"
+        coverage_targets:
+          - "arch_blueprint_generator/models/relationship_map.py::RelationshipMap._apply_detail_level_to_node"
+          - "arch_blueprint_generator/models/json_mirrors.py::JSONMirrors.get_mirrored_content"
+
+  - test_file: "tests/integration/sync/test_arch_sync_integration.py"
+    test_functions:
+      - name: "test_end_to_end_sync"
+        description: "End-to-end test of synchronization workflow with file changes"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/sync/arch_sync.py::ArchSync.sync"
+          - "arch_blueprint_generator/sync/change_tracker.py::ChangeTracker.detect_changes"
+      - name: "test_sync_performance"
+        description: "Integration test verifying sync performance for incremental vs full updates"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/sync/arch_sync.py::ArchSync._incremental_update"
+          - "arch_blueprint_generator/sync/arch_sync.py::ArchSync._force_rescan"
+      - name: "test_sync_with_scanner_integration"
+        description: "Tests integration between sync and scanner components"
+        story: "story-1.3"
+        coverage_targets:
+          - "arch_blueprint_generator/sync/arch_sync.py::ArchSync.sync"
+          - "arch_blueprint_generator/scanner/path_scanner.py::PathScanner.scan"
+
+  # Snapshot Tests
+  - test_file: "tests/snapshots/test_file_based_blueprint_snapshots.py"
+    test_functions:
+      - name: "test_file_based_blueprint_snapshot"
+        description: "Snapshot test ensuring file-based blueprint output format consistency"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/blueprints/file_based.py::FileBasedBlueprint.generate"
+          - "arch_blueprint_generator/blueprints/base.py::Blueprint.to_json"
+
+  - test_file: "tests/snapshots/test_relationship_map_snapshots.py"
+    test_functions:
+      - name: "test_relationship_map_snapshot"
+        description: "Snapshot test ensuring relationship map serialization format consistency"
+        story: "story-1.1"
+        coverage_targets:
+          - "arch_blueprint_generator/models/relationship_map.py::RelationshipMap.to_json"
+
+  # Contract Tests
+  - test_file: "tests/contracts/test_file_blueprint_schema.py"
+    test_functions:
+      - name: "test_file_blueprint_contract"
+        description: "Contract test validating file blueprint JSON schema compliance"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/blueprints/file_based.py::FileBasedBlueprint.to_json"
+      - name: "test_file_entry_schema"
+        description: "Contract test validating individual file entry schema in blueprints"
+        story: "story-2.1"
+        coverage_targets:
+          - "arch_blueprint_generator/blueprints/file_based.py::FileBasedBlueprint._process_file"
+
+# Test Coverage Summary by Story
+
+# Story 1.1 (Core Framework): 25 tests
+# - Relationship Map core functionality (8 tests)
+# - JSON Mirrors core functionality (5 tests) 
+# - Node and relationship types (6 tests)
+# - Blueprint base class (6 tests)
+
+# Story 1.2 (Path Scanner): 18 tests
+# - Basic scanning functionality (6 tests)
+# - Enhanced scanning with gitignore (4 tests)
+# - CLI scan command (13 tests)
+
+# Story 1.3 (Arch Sync): 12 tests
+# - Sync core functionality (5 tests)
+# - Change tracking (4 tests)
+# - CLI sync command (6 tests)
+# - Integration tests (3 tests)
+
+# Story 1.4 (Detail Levels): 14 tests
+# - Detail level models (3 tests)
+# - Relationship map detail filtering (3 tests)
+# - JSON mirrors detail filtering (3 tests)
+# - Integration with scanner (2 tests)
+# - CLI detail level support (3 tests)
+
+# Story 1.5 (File Blueprints): 8 tests
+# - File-based blueprint core (5 tests)
+# - Integration tests (3 tests)
+
+# Story 1.6 (CLI/API): 5 tests
+# - CLI blueprint commands (5 tests)
+
+# Story 2.1 (Base Blueprint Models): 16 tests
+# - Blueprint base class (12 tests)
+# - Factory pattern (4 tests)
+# - YAML configuration (4 tests)
+# - Contract tests (2 tests)
+
+# Story 2.2 (CLI Commands): 5 tests
+# - Blueprint CLI commands (5 tests)
+
+# Story 2.3 (Serialization): 4 tests
+# - JSON/XML output formats (4 tests)
+
+# Story 3.1 (Method Blueprints): 7 tests
+# - Method-based blueprint core (4 tests)
+# - Method extraction (3 tests)
+
+# Story 3.2 (Method Relationships): 1 test
+# - Method relationship mapping (1 test)
+
+# Story 3.3 (Method Detail Levels): 1 test
+# - Method detail level support (1 test)
+
+# Total Tests: 116 test functions across 27 test files

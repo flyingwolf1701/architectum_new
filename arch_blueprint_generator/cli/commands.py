@@ -13,7 +13,7 @@ import typer
 from colorama import Fore, Style
 
 from arch_blueprint_generator.utils.logging import configure_logging, get_logger
-from arch_blueprint_generator.scanner.path_scanner import PathScanner
+from arch_blueprint_generator.scanner.enhanced_path_scanner import EnhancedPathScanner
 from arch_blueprint_generator.models.detail_level import DetailLevel
 from arch_blueprint_generator.errors.exceptions import BlueprintError
 from arch_blueprint_generator.yaml import load_blueprint_config, YAMLValidationError
@@ -152,7 +152,7 @@ def blueprint_file(
                 warning(f"Synchronization failed: {str(e)}")
 
         root_dir = os.path.commonpath(resolved_files)
-        scanner = PathScanner(root_dir)
+        scanner = EnhancedPathScanner(root_dir)
         relationship_map, json_mirrors = scanner.scan()
 
         from arch_blueprint_generator.blueprints.factory import BlueprintFactory
@@ -215,7 +215,7 @@ def blueprint_create(
             error("No files specified in YAML", exit_code=1)
 
         root_dir = os.path.commonpath(files)
-        scanner = PathScanner(root_dir)
+        scanner = EnhancedPathScanner(root_dir)
         relationship_map, json_mirrors = scanner.scan()
 
         from arch_blueprint_generator.blueprints.factory import BlueprintFactory
@@ -256,16 +256,27 @@ def scan(
         None, "--output", "-o", help="Output directory for saving representations"
     ),
     exclude: List[str] = typer.Option(
-        [".git", ".venv", "__pycache__"],
+        [],
         "--exclude",
         "-e",
-        help="Patterns to exclude from scanning",
+        help="Patterns to exclude from scanning (legacy compatibility)",
     ),
     detail_level: str = typer.Option(
         "standard",
         "--detail-level",
         "-l",
         help="Detail level (minimal, standard, detailed)",
+    ),
+    gitignore: bool = typer.Option(
+        True,
+        "--gitignore/--no-gitignore",
+        help="Respect .gitignore files when scanning (default: True)",
+    ),
+    ignore: List[str] = typer.Option(
+        [],
+        "--ignore",
+        "-i",
+        help="Additional patterns to ignore beyond .gitignore",
     ),
 ) -> None:
     """
@@ -278,6 +289,26 @@ def scan(
     - minimal: Basic structure information only
     - standard: Essential information including types and basic attributes
     - detailed: Comprehensive information including documentation
+
+    GitIgnore Support:
+    - Automatically respects .gitignore files when found
+    - Use --no-gitignore to disable git ignore patterns
+    - Use --ignore to add additional patterns beyond .gitignore
+    - Legacy --exclude patterns are also supported
+
+    Examples:
+    
+        # Basic scan with gitignore support
+        arch scan .
+        
+        # Scan without respecting gitignore
+        arch scan . --no-gitignore
+        
+        # Add additional ignore patterns
+        arch scan . --ignore "*.log" --ignore "temp/"
+        
+        # Use legacy exclude patterns
+        arch scan . --exclude "__pycache__" --exclude ".pytest_cache"
     """
     try:
         # Convert string detail level to enum
@@ -287,8 +318,17 @@ def scan(
             typer.echo(f"{Fore.RED}Error: {str(e)}{Style.RESET_ALL}")
             raise typer.Exit(code=1)
 
-        # Create and run the path scanner
-        scanner = PathScanner(path, exclude_patterns=exclude)
+        # Handle default exclude patterns
+        if not exclude:
+            exclude = [".git", ".venv", "__pycache__"]
+        
+        # Create and run the enhanced path scanner
+        scanner = EnhancedPathScanner(
+            path, 
+            exclude_patterns=exclude,
+            respect_gitignore=gitignore,
+            additional_ignores=ignore
+        )
         relationship_map, json_mirrors = scanner.scan(
             max_depth=depth, detail_level=detail
         )
@@ -300,8 +340,20 @@ def scan(
         typer.echo(f"Path: {os.path.abspath(path)}")
         typer.echo(f"Depth: {depth if depth > 0 else 'unlimited'}")
         typer.echo(f"Detail Level: {detail.value}")
+        typer.echo(f"GitIgnore: {'enabled' if gitignore else 'disabled'}")
         typer.echo(f"Nodes: {node_count}")
         typer.echo(f"Relationships: {relationship_count}")
+        
+        # Show exclusion information
+        if gitignore and scanner.gitignore_parser:
+            gitignore_count = len(scanner.gitignore_parser.patterns)
+            typer.echo(f"GitIgnore patterns: {gitignore_count} loaded from .gitignore")
+        
+        if ignore:
+            typer.echo(f"Additional ignore patterns: {len(ignore)}")
+        
+        if exclude and exclude != [".git", ".venv", "__pycache__"]:
+            typer.echo(f"Legacy exclude patterns: {len(exclude)}")
 
         # If output directory specified, save representations
         if output:
